@@ -60,16 +60,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keypadPress', (event) => {
         const key = event.detail.key;
 
-        if ((key >= '0' && key <= '9') || key === '00') {
-            if (key === '00') {
-                if (currentInput !== '') {
-                    currentInput += '00';
-                }
-            } else if (currentInput === '0') {
+        if ((key >= '0' && key <= '9')) {
+            if (currentInput === '0') {
                 currentInput = key;
             } else {
                 currentInput += key;
             }
+        } else if (key === 'CE') {
+            currentInput = '';
+            inputField.value = '0';
         } else if (key === '✓') {
             if (currentInput) {
                 const value = parseInt(currentInput);
