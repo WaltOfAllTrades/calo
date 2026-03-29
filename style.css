@@ -105,7 +105,8 @@ body {
 
 .key-button.enter {
     background-color: #007aff;
-    color: white;
+    color: #fff;
+    fill: #fff;
 }
 
 /* Toggle Switch Styles */
