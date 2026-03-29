@@ -9,6 +9,13 @@
 			"isBackground": true,
 			"problemMatcher": [],
 			"group": "build"
+		},
+		{
+			"label": "Launch Calorie Tracker App",
+			"type": "shell",
+			"command": "npx serve . -l 8080",
+			"isBackground": true,
+			"group": "build"
 		}
 	]
 }
