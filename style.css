@@ -1,3 +1,6 @@
+html, body {
+    touch-action: manipulation;
+}
 .reset-logged-btn:active {
     background-color: #ffe5e5;
     transform: scale(0.97);
