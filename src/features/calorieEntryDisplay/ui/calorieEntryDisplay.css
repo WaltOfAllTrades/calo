@@ -1,0 +1,23 @@
+.calorie-entry-display {
+  inline-size: min(92vw, 360px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block-end: 0.75rem;
+  block-size: clamp(2.25rem, 10vw, 3.75rem);
+}
+
+.calorie-entry-display__intent {
+  font-size: clamp(1rem, 4vw, 1.4rem);
+  color: var(--intent-active);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.calorie-entry-display__value {
+  font-size: clamp(1.5rem, 8vw, 2.8rem);
+  font-weight: 500;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}

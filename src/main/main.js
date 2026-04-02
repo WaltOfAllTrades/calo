@@ -1,24 +1,70 @@
-import { db } from "../features/calories/infrastructure/db/dexieDb";
-import { logCalorieEvent } from "../features/calories/application/logCalorieEvent";
-import { getTodaysTotalCalories } from "../features/calories/application/getTodaysTotalCalories";
+import { createKeypad } from "../features/keypad/keypad.js";
+import { createCalorieEntryDisplay } from "../features/calorieEntryDisplay/ui/calorieEntryDisplay.js";
+import { logCalEntry } from "../features/calories/application/logCalEntry.js";
+import { createSettingsOverlay } from "../features/settings/ui/settingsOverlay.js";
+import { createMiniDailyDash } from "../features/miniDailyDash/ui/miniDailyDash.js";
+import { getTodayDashData } from "../features/miniDailyDash/application/getDashData.js";
+import { createAppHeader } from "../features/appHeader/ui/appHeader.js";
+import settingsIcon from "../features/settings/components/settings.svg";
 
-(async () => {
-  console.info("🧪 Starting calorie test");
+const app = document.getElementById("app");
 
-  // ✅ reset table before test
-  await db.table("CaloriesLog").clear();
-  console.info("🧹 Cleared CaloriesLog table");
+function openSettings() {
+  const overlay = createSettingsOverlay({
+    onClose() {
+      overlay.remove();
+    }
+  });
+  document.body.appendChild(overlay);
+}
 
-  // ✅ log multiple calorie events (today)
-  await logCalorieEvent(300, "add", "Breakfast", "Eggs and toast");
-  await logCalorieEvent(600, "add", "Lunch", "Sandwich");
-  await logCalorieEvent(150, "subtract", "Exercise", "Jogging");
-  await logCalorieEvent(400, "add", "Dinner", "Chicken and rice");
+// App header
+app.appendChild(
+  createAppHeader({ onSettingsClick: openSettings, settingsIcon })
+);
 
-  console.info("✅ Logged multiple calorie events");
+// Mini daily dash
+const dash = createMiniDailyDash();
+app.appendChild(dash.root);
 
-  // ✅ get today's total calories
-  const total = await getTodaysTotalCalories();
+async function refreshDash() {
+  const { logged, remaining } = await getTodayDashData();
+  dash.setLogged(logged);
+  dash.setRemaining(remaining);
+}
+refreshDash();
 
-  console.info("🔥 Today's total calories:", total);
-})();
+// Calorie entry display
+const display = createCalorieEntryDisplay();
+app.appendChild(display.root);
+
+// Logging guard
+let isLogging = false;
+
+app.appendChild(
+  createKeypad({
+    onBufferChange(buffer) {
+      display.setBuffer(buffer);
+    },
+    onIntentChange(intent) {
+      display.setIntent(intent);
+    },
+    async onEnter({ intent, value }) {
+      if (isLogging) {
+        dash.showError("Still logging — please wait");
+        return;
+      }
+      isLogging = true;
+      dash.clearError();
+      try {
+        const signed = intent === "add" ? value : -value;
+        await logCalEntry(signed);
+        await refreshDash();
+      } catch {
+        dash.showError("Log failed — please try again");
+      } finally {
+        isLogging = false;
+      }
+    }
+  })
+);

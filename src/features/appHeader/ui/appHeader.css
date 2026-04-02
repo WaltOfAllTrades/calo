@@ -1,0 +1,77 @@
+.app-header {
+  inline-size: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 0.5rem;
+}
+
+.app-header__title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35em;
+  min-inline-size: 0;
+  overflow: hidden;
+}
+
+.app-header__brand {
+  font-size: clamp(1rem, 4.5vw, 1.35rem);
+  font-weight: 700;
+  color: var(--text, #e5e7eb);
+  flex-shrink: 0;
+}
+
+.app-header__sep {
+  color: rgba(229, 231, 235, 0.3);
+  flex-shrink: 0;
+}
+
+.app-header__date {
+  font-size: clamp(0.8rem, 3.5vw, 1rem);
+  font-weight: 400;
+  color: rgba(229, 231, 235, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Responsive date variants */
+
+.app-header__date-full { display: inline; }
+.app-header__date-medium { display: none; }
+.app-header__date-short { display: none; }
+
+@container (max-width: 300px) {
+  .app-header__date-full { display: none; }
+  .app-header__date-medium { display: inline; }
+  .app-header__date-short { display: none; }
+}
+
+@container (max-width: 240px) {
+  .app-header__date-full { display: none; }
+  .app-header__date-medium { display: none; }
+  .app-header__date-short { display: inline; }
+}
+
+/* Settings button */
+
+.app-header__settings {
+  background: transparent;
+  border: none;
+  padding: 0.25rem;
+  touch-action: manipulation;
+  opacity: 0.6;
+  transition: opacity 90ms ease;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.app-header__settings:active {
+  opacity: 1;
+}
+
+.app-header__settings-icon {
+  inline-size: clamp(1.25rem, 5vw, 1.75rem);
+  block-size: clamp(1.25rem, 5vw, 1.75rem);
+  pointer-events: none;
+}

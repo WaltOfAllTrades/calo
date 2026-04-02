@@ -1,0 +1,121 @@
+:root {
+  --number: #2e2c2b;
+  --intent-active: #ff8a14;
+  --intent: color-mix(in hsl, var(--intent-active), black 62%);
+  --action: #ff8a14;
+  --bonus-number: color-mix(in hsl, var(--number), white 25%);
+}
+
+/* Base */
+
+.key-button {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  container-type: inline-size;
+
+  --key-face: var(--number);
+
+  position: relative;
+  isolation: isolate;
+
+  border-radius: 50%;
+  border: none;
+
+  display: grid;
+  place-items: center;
+
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: clamp(1rem, 35.5cqw, 2.6rem);
+  font-weight: 500;
+  color: rgb(255, 255, 255);
+
+  background: transparent;
+
+  transition:
+    transform 90ms ease,
+    filter 90ms ease,
+    outline-color 120ms ease;
+
+  touch-action: manipulation;
+}
+
+.key-button::before {
+  content: "";
+  position: absolute;
+  inset: -1.5%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e0dfdf 0%, #737373 50%, #e0dfdf 100%);
+
+  z-index: -2;
+  pointer-events: none;
+}
+
+.key-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--key-face);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.key-button__label {
+  position: relative;
+  z-index: 0;
+}
+
+.key-button__icon {
+  position: relative;
+  z-index: 0;
+  inline-size: clamp(1rem, 45cqw, 3rem);
+  block-size: clamp(1rem, 45cqw, 3rem);
+  pointer-events: none;
+}
+
+/* Variants */
+
+.key-button--number {
+  --key-face: var(--number);
+}
+
+.key-button--bonus-number {
+  --key-face: var(--bonus-number);
+}
+
+.key-button--intent {
+  --key-face: var(--intent);
+}
+
+.key-button--action {
+  --key-face: var(--action);
+}
+
+/* Active intent (mode) */
+
+.key-button--intent.is-active {
+  outline: 2px solid rgba(255, 255, 255);
+  outline-offset: 1.5%;
+  --key-face: var(--intent-active);
+}
+
+.key-button--intent.is-active::before {
+  background: none;
+}
+
+/* Press feedback */
+
+.key-button--number:active {
+  filter: brightness(1.15);
+  transform: scale(0.96);
+}
+
+.key-button--intent:active {
+  filter: brightness(1.25) saturate(1.1);
+  transform: scale(0.96);
+}
+
+.key-button--action:active {
+  filter: brightness(0.85);
+  transform: scale(0.94);
+}

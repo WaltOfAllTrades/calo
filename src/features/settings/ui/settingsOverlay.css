@@ -1,0 +1,163 @@
+/* Overlay backdrop */
+
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+}
+
+/* Card */
+
+.settings-card {
+  inline-size: min(88vw, 340px);
+  max-block-size: 85vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  background: var(--bg, #020617);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  contain: layout style paint;
+}
+
+/* Header */
+
+.settings-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.settings-card__logo {
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  aspect-ratio: 1 / 1;
+  border-radius: 0.5rem;
+  background: var(--intent-active, #ff8a14);
+  flex-shrink: 0;
+}
+
+.settings-card__app-name {
+  font-size: clamp(1.25rem, 5vw, 1.75rem);
+  font-weight: 700;
+  color: var(--text, #e5e7eb);
+}
+
+/* Nav buttons */
+
+.settings-card__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settings-card__nav-btn {
+  inline-size: 100%;
+  padding-block: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--text, #e5e7eb);
+  font-size: clamp(0.875rem, 3.5vw, 1rem);
+  font-weight: 500;
+  text-align: start;
+  padding-inline: 0.75rem;
+  touch-action: manipulation;
+}
+
+.settings-card__nav-btn:active {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Separator */
+
+.settings-card__sep {
+  border: none;
+  border-block-start: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 0;
+}
+
+/* Toggle row */
+
+.settings-card__toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 0.35rem;
+  font-size: clamp(0.875rem, 3.5vw, 1rem);
+  color: var(--text, #e5e7eb);
+  touch-action: manipulation;
+}
+
+.settings-card__toggle {
+  inline-size: 2.5rem;
+  block-size: 1.35rem;
+  accent-color: var(--intent-active, #ff8a14);
+}
+
+/* Daily target row */
+
+.settings-card__target-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 0.35rem;
+  font-size: clamp(0.875rem, 3.5vw, 1rem);
+  color: var(--text, #e5e7eb);
+}
+
+.settings-card__target-input {
+  inline-size: 5rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--text, #e5e7eb);
+  font-size: clamp(0.875rem, 3.5vw, 1rem);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.settings-card__target-input:focus {
+  outline: 2px solid var(--intent-active, #ff8a14);
+  outline-offset: 1px;
+}
+
+/* Close / Done button */
+
+.settings-card__close {
+  inline-size: 100%;
+  padding-block: 0.65rem;
+  margin-block-start: 0.25rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--intent-active, #ff8a14);
+  color: #fff;
+  font-size: clamp(0.875rem, 3.5vw, 1rem);
+  font-weight: 600;
+  touch-action: manipulation;
+}
+
+.settings-card__close:active {
+  filter: brightness(0.85);
+}
+
+/* Focus */
+
+:focus-visible {
+  outline: 2px solid var(--intent-active, #ff8a14);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
