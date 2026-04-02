@@ -14,6 +14,8 @@ const app = document.getElementById("app");
 async function applyFieldVisibility() {
   const settings = await loadSettings();
   details.setVisibility(settings);
+  const hasDetails = settings.showLogName || settings.showLogDescription;
+  app.classList.toggle("has-details", hasDetails);
 }
 
 function openSettings() {

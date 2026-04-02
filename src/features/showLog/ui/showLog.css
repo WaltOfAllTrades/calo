@@ -1,0 +1,96 @@
+.show-log {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+.show-log__body {
+  display: flex;
+  flex-direction: column;
+  inline-size: min(92vw, 360px);
+  flex: 1;
+  min-block-size: 0;
+  padding-block-start: 1.5rem;
+}
+
+.show-log__title {
+  margin: 0;
+  font-size: clamp(1.2rem, 5vw, 1.6rem);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.show-log__subtitle {
+  margin: 0.3rem 0 1rem;
+  font-size: clamp(0.8rem, 3.2vw, 0.95rem);
+  color: color-mix(in hsl, var(--text), transparent 45%);
+}
+
+.show-log__scroll {
+  flex: 1;
+  min-block-size: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.show-log__empty {
+  text-align: center;
+  padding-block-start: 3rem;
+  font-size: clamp(0.85rem, 3.5vw, 1rem);
+  color: color-mix(in hsl, var(--text), transparent 55%);
+}
+
+/* Table */
+
+.show-log__table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: clamp(0.8rem, 3.4vw, 0.95rem);
+  table-layout: auto;
+}
+
+.show-log__table thead {
+  position: sticky;
+  inset-block-start: 0;
+  background: var(--bg);
+  z-index: 1;
+}
+
+.show-log__table th {
+  text-align: start;
+  font-weight: 500;
+  font-size: clamp(0.7rem, 2.8vw, 0.8rem);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: color-mix(in hsl, var(--text), transparent 50%);
+  padding-block: 0.5rem;
+  padding-inline: 0.4rem;
+  border-block-end: 1px solid color-mix(in hsl, var(--text), transparent 80%);
+}
+
+.show-log__table td {
+  padding-block: 0.6rem;
+  padding-inline: 0.4rem;
+  color: var(--text);
+  border-block-end: 1px solid color-mix(in hsl, var(--text), transparent 90%);
+  vertical-align: top;
+}
+
+.show-log__cal-cell {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.show-log__cal-cell--neg {
+  color: #ef4444;
+}

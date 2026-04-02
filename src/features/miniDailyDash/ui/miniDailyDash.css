@@ -1,5 +1,7 @@
 .mini-daily-dash {
   inline-size: 100%;
+  block-size: 100%;
+  align-self: stretch;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -21,7 +23,7 @@
   justify-content: center;
   overflow: hidden;
   font-variant-numeric: tabular-nums;
-  font-size: clamp(1.5rem, 8vw, 2.8rem);
+  font-size: clamp(2.5rem, 8dvh, 5rem);
   font-weight: 600;
   color: var(--text, #e5e7eb);
   line-height: 1.2;
@@ -30,7 +32,7 @@
 }
 
 .mini-daily-dash__label {
-  font-size: clamp(0.6rem, 2.8vw, 0.8rem);
+  font-size: clamp(0.65rem, 1.5dvh, 0.85rem);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -41,9 +43,19 @@
 
 .mini-daily-dash__divider {
   inline-size: 1px;
-  block-size: 3rem;
+  block-size: clamp(2rem, 5dvh, 4.5rem);
   background: rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
+}
+
+/* Shrink when additional logging details are visible */
+
+#app.has-details .mini-daily-dash__digits {
+  font-size: clamp(2rem, 6dvh, 4rem);
+}
+
+#app.has-details .mini-daily-dash__divider {
+  block-size: clamp(1.5rem, 4dvh, 3.5rem);
 }
 
 /* Single digit slot */
@@ -77,7 +89,7 @@
 /* Negative indicator */
 
 .mini-daily-dash__sign {
-  font-size: clamp(1rem, 4vw, 1.4rem);
+  font-size: clamp(1.5rem, 5dvh, 3rem);
   font-weight: 600;
   color: var(--text, #e5e7eb);
   line-height: 1.2;

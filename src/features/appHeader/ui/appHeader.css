@@ -1,10 +1,9 @@
 .app-header {
-  inline-size: 100%;
+  inline-size: min(92vw, 360px);
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding-block: 0.5rem;
-  align-self: start;
 }
 
 .app-header__brand {

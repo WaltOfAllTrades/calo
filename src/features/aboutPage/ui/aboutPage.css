@@ -13,10 +13,6 @@
     env(safe-area-inset-left);
 }
 
-.about-page > .app-header {
-  inline-size: min(92vw, 360px);
-}
-
 .about-page__body {
   display: flex;
   flex-direction: column;

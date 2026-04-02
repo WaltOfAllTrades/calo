@@ -1,5 +1,6 @@
 import { loadSettings, saveSetting } from "../application/settingsService.js";
 import { createAboutPage } from "../../aboutPage/ui/aboutPage.js";
+import { createShowLogPage } from "../../showLog/ui/showLog.js";
 
 export function createSettingsOverlay({ onClose }) {
   const overlay = document.createElement("div");
@@ -39,6 +40,12 @@ export function createSettingsOverlay({ onClose }) {
 
     const todayLogBtn = createNavButton("Today's Log", () => {
       onClose();
+      const logPage = createShowLogPage({
+        onBack() {
+          logPage.remove();
+        }
+      });
+      document.body.appendChild(logPage);
     });
     const reportsBtn = createNavButton("Reports", () => {
       onClose();

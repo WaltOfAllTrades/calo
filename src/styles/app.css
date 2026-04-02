@@ -3,6 +3,10 @@
   --text: #e5e7eb;
 }
 
+html {
+  background-color: var(--bg);
+}
+
 body {
   margin: 0;
   block-size: 100dvh;
@@ -31,7 +35,6 @@ body {
 #app {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  align-items: center;
   justify-items: center;
   inline-size: min(92vw, 360px);
   block-size: 100%;

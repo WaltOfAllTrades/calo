@@ -33,7 +33,7 @@ export function createAdditionalLoggingDetails() {
       nameInput.style.display = showLogName ? "" : "none";
       descInput.style.display = showLogDescription ? "" : "none";
       root.style.display =
-        showLogName || showLogDescription ? "" : "none";
+        showLogName || showLogDescription ? "flex" : "none";
     }
   };
 }
