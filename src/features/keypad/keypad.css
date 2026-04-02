@@ -1,8 +1,11 @@
 .keypad {
-  width: min(92vw, 360px);
-  aspect-ratio: 1 / 1;
+  inline-size: 100%;
+  aspect-ratio: 4 / 5;
+  flex-shrink: 0;
+  margin-block-end: 1rem;
 
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  grid-template-rows: repeat(5, 1fr);
+  gap: clamp(0.4rem, 1.2cqi, 0.75rem);
 }

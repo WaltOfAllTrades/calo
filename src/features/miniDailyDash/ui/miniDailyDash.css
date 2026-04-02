@@ -4,7 +4,6 @@
   align-items: center;
   justify-content: center;
   gap: 0;
-  padding-block: 0.75rem;
 }
 
 /* Counter columns */
@@ -22,10 +21,12 @@
   justify-content: center;
   overflow: hidden;
   font-variant-numeric: tabular-nums;
-  font-size: clamp(1.25rem, 6vw, 2rem);
+  font-size: clamp(1.5rem, 8vw, 2.8rem);
   font-weight: 600;
   color: var(--text, #e5e7eb);
   line-height: 1.2;
+  white-space: nowrap;
+  flex-wrap: nowrap;
 }
 
 .mini-daily-dash__label {
@@ -40,7 +41,7 @@
 
 .mini-daily-dash__divider {
   inline-size: 1px;
-  block-size: 2.2rem;
+  block-size: 3rem;
   background: rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
 }
@@ -52,6 +53,8 @@
   overflow: hidden;
   block-size: 1.2em;
   position: relative;
+  transform: translateZ(0);
+  -webkit-mask-image: linear-gradient(#000, #000);
 }
 
 .mini-daily-dash__digit-reel {

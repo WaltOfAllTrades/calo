@@ -1,4 +1,5 @@
 import { loadSettings, saveSetting } from "../application/settingsService.js";
+import { createAboutPage } from "../../aboutPage/ui/aboutPage.js";
 
 export function createSettingsOverlay({ onClose }) {
   const overlay = document.createElement("div");
@@ -36,9 +37,21 @@ export function createSettingsOverlay({ onClose }) {
     const navGroup = document.createElement("div");
     navGroup.className = "settings-card__nav";
 
-    const todayLogBtn = createNavButton("Today's Log", () => {});
-    const reportsBtn = createNavButton("Reports", () => {});
-    const aboutBtn = createNavButton("About", () => {});
+    const todayLogBtn = createNavButton("Today's Log", () => {
+      onClose();
+    });
+    const reportsBtn = createNavButton("Reports", () => {
+      onClose();
+    });
+    const aboutBtn = createNavButton("About", () => {
+      onClose();
+      const aboutPage = createAboutPage({
+        onBack() {
+          aboutPage.remove();
+        }
+      });
+      document.body.appendChild(aboutPage);
+    });
 
     navGroup.appendChild(todayLogBtn);
     navGroup.appendChild(reportsBtn);

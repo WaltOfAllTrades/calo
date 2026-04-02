@@ -1,7 +1,9 @@
 import { createKeypad } from "../features/keypad/keypad.js";
 import { createCalorieEntryDisplay } from "../features/calorieEntryDisplay/ui/calorieEntryDisplay.js";
+import { createAdditionalLoggingDetails } from "../features/additionalLoggingDetails/ui/additionalLoggingDetails.js";
 import { logCalEntry } from "../features/calories/application/logCalEntry.js";
 import { createSettingsOverlay } from "../features/settings/ui/settingsOverlay.js";
+import { loadSettings } from "../features/settings/application/settingsService.js";
 import { createMiniDailyDash } from "../features/miniDailyDash/ui/miniDailyDash.js";
 import { getTodayDashData } from "../features/miniDailyDash/application/getDashData.js";
 import { createAppHeader } from "../features/appHeader/ui/appHeader.js";
@@ -9,10 +11,16 @@ import settingsIcon from "../features/settings/components/settings.svg";
 
 const app = document.getElementById("app");
 
+async function applyFieldVisibility() {
+  const settings = await loadSettings();
+  details.setVisibility(settings);
+}
+
 function openSettings() {
   const overlay = createSettingsOverlay({
     onClose() {
       overlay.remove();
+      applyFieldVisibility();
     }
   });
   document.body.appendChild(overlay);
@@ -34,14 +42,22 @@ async function refreshDash() {
 }
 refreshDash();
 
+// Bottom group: details + display + keypad
+const bottomGroup = document.createElement("div");
+bottomGroup.className = "app-bottom-group";
+
+// Additional logging details
+const details = createAdditionalLoggingDetails();
+bottomGroup.appendChild(details.root);
+
 // Calorie entry display
 const display = createCalorieEntryDisplay();
-app.appendChild(display.root);
+bottomGroup.appendChild(display.root);
 
 // Logging guard
 let isLogging = false;
 
-app.appendChild(
+bottomGroup.appendChild(
   createKeypad({
     onBufferChange(buffer) {
       display.setBuffer(buffer);
@@ -58,7 +74,8 @@ app.appendChild(
       dash.clearError();
       try {
         const signed = intent === "add" ? value : -value;
-        await logCalEntry(signed);
+        await logCalEntry(signed, details.getName(), details.getDescription());
+        details.clear();
         await refreshDash();
       } catch {
         dash.showError("Log failed — please try again");
@@ -68,3 +85,6 @@ app.appendChild(
     }
   })
 );
+
+app.appendChild(bottomGroup);
+applyFieldVisibility();

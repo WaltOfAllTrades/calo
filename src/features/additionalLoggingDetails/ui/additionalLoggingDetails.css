@@ -1,0 +1,36 @@
+.additional-logging-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  inline-size: 100%;
+  margin-block-end: 0.4rem;
+  flex-shrink: 0;
+}
+
+.additional-logging-details__field {
+  inline-size: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid color-mix(in hsl, var(--text), transparent 75%);
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: clamp(0.85rem, 3.5cqw, 1rem);
+  outline: none;
+  transition: border-color 100ms;
+  touch-action: manipulation;
+}
+
+.additional-logging-details__field::placeholder {
+  color: color-mix(in hsl, var(--text), transparent 60%);
+}
+
+.additional-logging-details__field:focus {
+  border-color: color-mix(in hsl, var(--text), transparent 40%);
+}
+
+.additional-logging-details__desc {
+  resize: none;
+  line-height: 1.4;
+}

@@ -5,6 +5,7 @@
   justify-content: space-between;
   padding-block-end: 0.75rem;
   block-size: clamp(2.25rem, 10vw, 3.75rem);
+  flex-shrink: 0;
 }
 
 .calorie-entry-display__intent {

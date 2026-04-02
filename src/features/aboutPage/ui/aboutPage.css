@@ -1,0 +1,88 @@
+.about-page {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  container-type: inline-size;
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+.about-page > .app-header {
+  inline-size: min(92vw, 360px);
+}
+
+.about-page__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-block-start: 4rem;
+  text-align: center;
+  inline-size: min(92vw, 360px);
+}
+
+.about-page__pullquote {
+  position: relative;
+  margin: 0;
+  padding: 1.5rem 1.25rem;
+  border: 1px solid color-mix(in hsl, var(--text), transparent 75%);
+  border-radius: 0.5rem;
+  inline-size: 100%;
+  box-sizing: border-box;
+}
+
+.about-page__pullquote::before,
+.about-page__pullquote::after {
+  position: absolute;
+  font-size: clamp(2.5rem, 10cqw, 3.5rem);
+  font-family: Georgia, serif;
+  color: color-mix(in hsl, var(--text), transparent 60%);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.about-page__pullquote::before {
+  content: "\201C";
+  inset-block-start: -0.15em;
+  inset-inline-start: 0.3rem;
+}
+
+.about-page__pullquote::after {
+  content: "\201D";
+  inset-block-end: -0.5em;
+  inset-inline-end: 0.3rem;
+}
+
+.about-page__pullquote-text {
+  font-size: clamp(1.05rem, 4.5cqw, 1.35rem);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.about-page__tagline {
+  font-size: clamp(0.9rem, 3.8cqw, 1.1rem);
+  font-weight: 400;
+  color: color-mix(in hsl, var(--text), transparent 40%);
+  margin: 0;
+}
+
+.about-page__content {
+  padding-block-start: 1.5rem;
+  font-size: clamp(0.85rem, 3.5cqw, 1rem);
+  line-height: 1.6;
+  color: color-mix(in hsl, var(--text), transparent 30%);
+  text-align: start;
+}
+
+.about-page__content p {
+  margin: 0 0 1rem;
+}
