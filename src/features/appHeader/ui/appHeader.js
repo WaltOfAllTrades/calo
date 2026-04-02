@@ -32,16 +32,9 @@ export function createAppHeader({ onSettingsClick, settingsIcon }) {
   const root = document.createElement("header");
   root.className = "app-header";
 
-  const title = document.createElement("div");
-  title.className = "app-header__title";
-
   const brand = document.createElement("span");
   brand.className = "app-header__brand";
   brand.textContent = "Calo";
-
-  const sep = document.createElement("span");
-  sep.className = "app-header__sep";
-  sep.textContent = "–";
 
   const dateEl = document.createElement("span");
   dateEl.className = "app-header__date";
@@ -59,10 +52,6 @@ export function createAppHeader({ onSettingsClick, settingsIcon }) {
   dateEl.appendChild(dateMedium);
   dateEl.appendChild(dateShort);
 
-  title.appendChild(brand);
-  title.appendChild(sep);
-  title.appendChild(dateEl);
-
   const settingsBtn = document.createElement("button");
   settingsBtn.className = "app-header__settings";
   settingsBtn.setAttribute("aria-label", "Settings");
@@ -74,7 +63,8 @@ export function createAppHeader({ onSettingsClick, settingsIcon }) {
   settingsBtn.appendChild(img);
   settingsBtn.addEventListener("click", onSettingsClick);
 
-  root.appendChild(title);
+  root.appendChild(brand);
+  root.appendChild(dateEl);
   root.appendChild(settingsBtn);
 
   function updateDate() {
