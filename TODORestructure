@@ -1,0 +1,180 @@
+# Restructure Recommendations
+
+## Summary
+
+10 features → 7, plus a new `src/shared/` directory for cross-cutting concerns.
+Eliminates most cross-feature import violations.
+
+---
+
+## Current Cross-Feature Import Map
+
+| Feature                    | Imports From                                         |
+|----------------------------|------------------------------------------------------|
+| keypad                     | (none)                                               |
+| calorieEntryDisplay        | (none)                                               |
+| additionalLoggingDetails   | (none)                                               |
+| calories                   | (none — but owns the shared DB)                      |
+| miniDailyDash              | calories, settings                                   |
+| showLog                    | calories, appHeader, aboutPage (back.svg)            |
+| settings                   | calories (dexieDb + clearTodayLog), aboutPage, showLog |
+| appHeader                  | today                                                |
+| aboutPage                  | appHeader                                            |
+| today                      | (none)                                               |
+
+---
+
+## Changes
+
+### 1. Merge keypad + calorieEntryDisplay + additionalLoggingDetails → calorieInput
+
+These three are exclusively wired together in main.js to form the single calorie entry
+input group. calorieEntryDisplay and additionalLoggingDetails have zero domain, application,
+or infrastructure layers — they are pure UI children of the keypad-driven input flow with
+no independent consumers.
+
+### 2. Extract shared database → src/shared/infrastructure/db/
+
+dexieDb.js defines the single Dexie instance with tables for both calories (calLog,
+CaloriesLog) and settings (userSettings). It currently lives in calories/infrastructure/db/
+but SettingsRepository imports it cross-feature. This is the app's single database — it
+belongs in shared infrastructure.
+
+### 3. Absorb today into appHeader
+
+today.js exports 2 functions (getTodayDate, onDateChange). Its sole consumer is
+appHeader.js. It has no domain, persistence, or UI of its own. Renamed to dateWatch.js
+for clarity.
+
+### 4. Extract shared icon assets → src/shared/assets/icons/
+
+back.svg lives in aboutPage/components/ but is imported by showLog too. settings.svg is
+in settings/components/. Shared assets shouldn't live inside a single feature.
+
+### 5. No change needed
+
+calories, miniDailyDash, showLog, settings, aboutPage, appHeader — these have distinct
+responsibilities and stay as-is (with import path updates only).
+
+---
+
+## Proposed Final Structure
+
+src/
+  shared/
+    infrastructure/
+      db/
+        dexieDb.js
+    assets/
+      icons/
+        back.svg
+        settings.svg
+  features/
+    calories/
+      domain/
+        CalLogEvent.js
+        index.js
+      application/
+        logCalorieEvent.js
+        logCalEntry.js
+        getTodaysTotalCalories.js
+        clearTodayLog.js
+      infrastructure/
+        CalLogRepository.js
+        CaloriesLogRepository.js
+        seedTestData.js
+        index.js
+    calorieInput/                         ← NEW (merged from keypad + calorieEntryDisplay + additionalLoggingDetails)
+      ui/
+        calorieInput.css                  ← was keypad.css
+        calorieInput.js                   ← was keypad.js (or thin wrapper composing all three)
+        calorieEntryDisplay.css
+        calorieEntryDisplay.js
+        additionalLoggingDetails.css
+        additionalLoggingDetails.js
+      components/
+        keyButton.css
+        keyButton.js
+    miniDailyDash/
+      application/
+        getDashData.js
+      ui/
+        miniDailyDash.css
+        miniDailyDash.js
+    showLog/
+      application/
+        getTodayLog.js
+        manageLogEntry.js
+      components/
+        editEntryCard.js
+      ui/
+        showLog.css
+        showLog.js
+    settings/
+      domain/
+        settingsDefaults.js
+        index.js
+      application/
+        settingsService.js
+      infrastructure/
+        SettingsRepository.js
+        index.js
+      ui/
+        settingsOverlay.css
+        settingsOverlay.js
+    appHeader/                            ← absorbs today
+      ui/
+        appHeader.css
+        appHeader.js
+        dateWatch.js                      ← was today/today.js
+    aboutPage/
+      ui/
+        aboutPage.css
+        aboutPage.js
+        aboutContent.html
+  main/
+    main.js
+  styles/
+    app.css
+
+---
+
+## Files Requiring Import Path Updates
+
+| File                       | What Changes                                                       |
+|----------------------------|--------------------------------------------------------------------|
+| CalLogRepository.js        | dexieDb import → ../../../shared/infrastructure/db/dexieDb.js       |
+| CaloriesLogRepository.js   | dexieDb import → ../../../shared/infrastructure/db/dexieDb.js       |
+| seedTestData.js            | dexieDb import → ../../../shared/infrastructure/db/dexieDb.js       |
+| SettingsRepository.js      | dexieDb import → ../../../shared/infrastructure/db/dexieDb.js       |
+| appHeader.js               | today import → ./dateWatch.js                                      |
+| showLog.js                 | back.svg → ../../../shared/assets/icons/back.svg                   |
+| aboutPage.js               | back.svg → ../../../shared/assets/icons/back.svg                   |
+| settingsOverlay.js         | settings.svg → ../../../shared/assets/icons/settings.svg           |
+| main.js                    | keypad/calorieEntryDisplay/additionalLoggingDetails → calorieInput |
+| index.html                 | CSS <link> paths updated for renamed/moved files                   |
+
+---
+
+## Verification
+
+1. npm run dev — app loads without console errors
+2. Calorie entry flow: keypad → display → log → dash refresh
+3. Settings overlay opens, persists, and navigates to About/ShowLog
+4. npm run build — no broken imports
+
+---
+
+## Future Considerations (out of scope for this restructure)
+
+1. DUAL REPOSITORY CLEANUP — CalLogRepository (plain objects) and CaloriesLogRepository
+   (domain-hydrated) overlap. Consolidate to one. Likely keep CalLogRepository and drop
+   CaloriesLogRepository + the unused logCalorieEvent.js / getTodaysTotalCalories.js
+   use-cases if they have no consumers.
+
+2. SETTINGS AS ROUTING HUB — settingsOverlay.js directly imports createAboutPage and
+   createShowLogPage, making it a de facto router. A future refactor could introduce a
+   lightweight page-router in main.js to decouple navigation.
+
+3. EMPTY SCAFFOLD FOLDERS — Remove .keep placeholder folders in miniDailyDash (domain/,
+   infrastructure/, components/) since they have no planned content.

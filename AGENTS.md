@@ -84,6 +84,7 @@ This app targets phones first. Every layout and sizing decision must work on a 3
 - Use `:active` for press feedback, not `:hover`. Mobile has no hover state.
 - Keep transitions short (60–120ms) for tactile feel.
 - Never rely on hover-only interactions (tooltips, dropdown menus on hover).
+- **Input font size must be at least 16px** (`1rem` minimum in `clamp()`) to prevent iOS Safari from auto-zooming on focus.
 
 ### Responsive Strategy
 

@@ -1,0 +1,348 @@
+# Item Suggestions — Implementation Plan
+
+## Feature Summary
+
+The item name input in additionalLoggingDetails gains a dropdown activated by a caret
+button. The dropdown shows up to 25 ranked items (7 visible, scrollable) based on a
+frequency-weighted algorithm favoring recent usage. Typing in the field filters the list.
+
+---
+
+## Algorithm
+
+### Scoring
+
+One query fetches all calLog entries from the last 30 days. Three overlapping time
+windows are counted per unique non-empty item name (case-insensitive grouping):
+
+    freq3  = count of appearances in last 3 days
+    freq7  = count of appearances in last 7 days
+    freq30 = count of appearances in last 30 days
+
+    presence = (freq3 > 0 ? 1 : 0)
+             + (freq7 > 0 ? 1 : 0)
+             + (freq30 > 0 ? 1 : 0)
+
+    score = (freq3 × 5) + (freq7 × 3) + (freq30 × 1) + (presence × 4)
+
+Windows overlap intentionally — an item logged yesterday scores in all three buckets.
+The multipliers (5 / 3 / 1 / 4) are tunable constants defined in the use-case file.
+
+### Ranking
+
+1. Sort all scored items descending by score.
+2. Take the top 25.
+3. If fewer than 25, fill remaining slots with the most recently logged unique names
+   not already in the list (one entry each, ordered by recency).
+4. No item appears more than once.
+
+### Case Handling
+
+- Group by name.toLowerCase() when counting.
+- Display the most recently used casing (the casing from the newest calLog row for
+  that normalized name).
+
+---
+
+## Performance Strategy: In-Memory Cache with Dirty Flag
+
+No extra IndexedDB table. Data volume is ~150-300 rows for 30 days. A single indexed
+range query on createdOn takes <20ms even on low-end phones. The dropdown opens on an
+explicit user tap, so the compute is imperceptible.
+
+    ┌──────────────┐   first open / dirty    ┌───────────────────┐
+    │   Dropdown   │ ──────────────────────▶  │  getLastNDays(30) │
+    │   requests   │                          │  compute scores   │
+    │   top items  │ ◀──────────────────────  │  cache result     │
+    └──────────────┘    return cached list     └───────────────────┘
+
+- Compute on first dropdown open. Store the ranked list in a module-level variable.
+- Set a dirty flag after any logCalEntry, deleteLogEntry, or updateLogEntry completes.
+- Next dropdown open checks the flag: dirty → recompute; clean → return cached list.
+- No DB migration. No extra table. No async sync.
+
+### Invalidation Hook
+
+Export a simple invalidate function from the use-case file. Call it from logCalEntry,
+deleteLogEntry, and updateLogEntry after their await completes.
+
+---
+
+## File Layout
+
+All paths assume the proposed restructure (calorieInput feature). If restructure has
+not been done yet, substitute the current paths.
+
+### New files
+
+    features/calorieInput/application/getTopItems.js
+        - exports: getTopItems()        → returns Promise<string[]> (up to 25 names)
+        - exports: invalidateTopItems() → sets dirty flag
+        - imports: CalLogRepository from calories/infrastructure
+        - contains: scoring constants, cache variable, dirty flag, algorithm
+
+### Modified files
+
+    features/calories/infrastructure/CalLogRepository.js
+        - ADD method: getLastNDays(n)
+          Returns all calLog entries where createdOn is within the last n days.
+          Single indexed range query on createdOn.
+
+    features/calorieInput/ui/additionalLoggingDetails.js
+        (currently features/additionalLoggingDetails/ui/additionalLoggingDetails.js)
+        - ADD caret button next to the name input
+        - ADD dropdown container (ul element, max 7 visible, overflow-y scroll)
+        - Wire: caret tap → call getTopItems() → render list
+        - Wire: item tap → set nameInput.value, close dropdown
+        - Wire: nameInput 'input' event → filter displayed list by prefix match
+          (client-side filter of the cached 25, no re-query)
+        - Wire: click outside / Escape → close dropdown
+        - Expose invalidateTopItems in the returned API so main.js can call it
+          after logging
+
+    features/calorieInput/ui/additionalLoggingDetails.css
+        (currently features/additionalLoggingDetails/ui/additionalLoggingDetails.css)
+        - ADD styles for caret button, dropdown list, selected/active states
+
+    features/calories/application/logCalEntry.js
+        - After repo.add(), call invalidateTopItems()
+
+    features/showLog/application/manageLogEntry.js
+        - After deleteLogEntry / updateLogEntry, call invalidateTopItems()
+
+    index.html
+        - No changes (CSS linked from existing file, path stays the same or updates
+          per restructure)
+
+---
+
+## New Repository Method
+
+CalLogRepository.getLastNDays(n):
+
+    async getLastNDays(n) {
+      const now = new Date();
+      const start = new Date(
+        now.getFullYear(), now.getMonth(), now.getDate() - n
+      ).toISOString();
+      return db
+        .table("calLog")
+        .where("createdOn")
+        .above(start)
+        .toArray();
+    }
+
+Single indexed range scan. Returns all fields (id, calories, name, description,
+createdOn, updatedOn). The use-case only reads name and createdOn.
+
+---
+
+## Use-Case: getTopItems.js
+
+Pseudocode:
+
+    const WEIGHTS = { days3: 5, days7: 3, days30: 1, presence: 4 };
+    const MAX_ITEMS = 25;
+
+    let cache = null;
+    let dirty = true;
+
+    export function invalidateTopItems() { dirty = true; }
+
+    export async function getTopItems() {
+      if (!dirty && cache) return cache;
+
+      const repo = new CalLogRepository();
+      const rows = await repo.getLastNDays(30);
+
+      const now = new Date();
+      const cutoff3 = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 3).getTime();
+      const cutoff7 = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7).getTime();
+
+      // Group by normalized name
+      const map = new Map();   // key: lowercase name, value: { display, freq3, freq7, freq30, lastSeen }
+
+      for (const row of rows) {
+        const raw = (row.name || "").trim();
+        if (!raw) continue;
+        const key = raw.toLowerCase();
+        const ts = new Date(row.createdOn).getTime();
+
+        let entry = map.get(key);
+        if (!entry) {
+          entry = { display: raw, freq3: 0, freq7: 0, freq30: 0, lastSeen: ts };
+          map.set(key, entry);
+        }
+
+        entry.freq30 += 1;
+        if (ts >= cutoff7) entry.freq7 += 1;
+        if (ts >= cutoff3) entry.freq3 += 1;
+        if (ts > entry.lastSeen) {
+          entry.lastSeen = ts;
+          entry.display = raw;          // keep most recent casing
+        }
+      }
+
+      // Score and sort
+      const scored = [...map.values()].map(e => ({
+        name: e.display,
+        score:
+          e.freq3  * WEIGHTS.days3 +
+          e.freq7  * WEIGHTS.days7 +
+          e.freq30 * WEIGHTS.days30 +
+          ((e.freq3 > 0) + (e.freq7 > 0) + (e.freq30 > 0)) * WEIGHTS.presence,
+        lastSeen: e.lastSeen
+      }));
+
+      scored.sort((a, b) => b.score - a.score);
+      const top = scored.slice(0, MAX_ITEMS);
+
+      // Fill remaining slots with most-recent unique names not yet included
+      if (top.length < MAX_ITEMS) {
+        const included = new Set(top.map(t => t.name.toLowerCase()));
+        const recents = [...map.values()]
+          .filter(e => !included.has(e.display.toLowerCase()))
+          .sort((a, b) => b.lastSeen - a.lastSeen)
+          .slice(0, MAX_ITEMS - top.length);
+        for (const r of recents) {
+          top.push({ name: r.display, score: 0, lastSeen: r.lastSeen });
+        }
+      }
+
+      cache = top.map(t => t.name);
+      dirty = false;
+      return cache;
+    }
+
+---
+
+## UI Behavior
+
+### Caret Button
+
+- Small down-caret icon (▾ character or SVG) appended inside or after the name input.
+- Touch target: 44×44 CSS pixels minimum.
+- Tapping the caret calls getTopItems() and opens the dropdown.
+- If the dropdown is already open, tapping the caret closes it.
+
+### Dropdown List
+
+- A ul element positioned below the name input.
+- Max 7 visible items (item height × 7 = list max-height), overflow-y: auto for
+  scrolling.
+- Each li shows the item name. Tap selects: sets nameInput.value and closes dropdown.
+- :active state for tap feedback.
+
+### Typing Filter
+
+- While dropdown is open and user types in nameInput, filter the cached list by
+  case-insensitive prefix match and re-render visible items.
+- If filter produces 0 matches, show "No matches" disabled item.
+- If dropdown is closed and user types, do NOT auto-open. Only the caret opens it.
+
+### Closing
+
+- Tap outside the dropdown or the name input → close.
+- Escape key → close.
+- Selecting an item → close.
+
+### Accessibility
+
+- Dropdown gets role="listbox", items get role="option".
+- Caret button gets aria-label="Show recent items", aria-expanded="true/false".
+- Arrow keys navigate the list, Enter selects.
+
+---
+
+## CSS Additions (additionalLoggingDetails.css)
+
+    .additional-logging-details__name-wrapper
+        position: relative (anchor for dropdown)
+        display: flex
+
+    .additional-logging-details__caret
+        min-width/min-height: 44px
+        touch-action: manipulation
+        background: transparent
+        border: none
+        color: var(--text)
+        font-size: clamp(1rem, 4cqw, 1.4rem)
+        cursor: pointer
+
+    .additional-logging-details__dropdown
+        position: absolute
+        top: 100%
+        left: 0
+        inline-size: 100%
+        max-block-size: calc(7 × 2.5rem)    ← 7 items visible
+        overflow-y: auto
+        overscroll-behavior: contain
+        background: var(--bg)
+        border: 1px solid color-mix(in hsl, var(--text), transparent 70%)
+        border-radius: 0.5rem
+        z-index: 10
+        list-style: none
+        margin: 0
+        padding: 0
+
+    .additional-logging-details__dropdown-item
+        padding-block: 0.5rem
+        padding-inline: 0.75rem
+        touch-action: manipulation
+        cursor: pointer
+
+    .additional-logging-details__dropdown-item:active
+        background: color-mix(in hsl, var(--intent-active), transparent 80%)
+
+---
+
+## Invalidation Wiring
+
+After restructure, these files call invalidateTopItems():
+
+    // logCalEntry.js
+    import { invalidateTopItems } from "../calorieInput/application/getTopItems.js";
+    // ... after await repo.add(...)
+    invalidateTopItems();
+
+    // manageLogEntry.js
+    import { invalidateTopItems } from "../../calorieInput/application/getTopItems.js";
+    // ... after await repo.deleteById(...) and await repo.updateById(...)
+    invalidateTopItems();
+
+If the restructure has not happened yet, adjust import paths to match current locations.
+
+---
+
+## Testing Checklist
+
+1. Open dropdown with caret → shows ranked items
+2. Items from last 3 days appear at top
+3. Items appearing across all 3 windows rank higher than single-window items
+4. List has no duplicates
+5. Fewer than 25 scored items → remaining slots filled with most recent
+6. Tap item → populates name input, dropdown closes
+7. Type partial name → dropdown filters by prefix
+8. Log new entry → reopen dropdown → list reflects new entry
+9. Delete entry from showLog → reopen dropdown → list updated
+10. Dropdown scrollable when >7 items
+11. Escape / tap outside → closes dropdown
+12. Caret toggle: tap open, tap again closed
+13. Minimum 44×44 tap target on caret
+14. Works at 320px viewport width
+
+---
+
+## Weight Tuning
+
+The scoring weights are constants in getTopItems.js. Adjust if the ranking feels wrong:
+
+    Current: { days3: 5, days7: 3, days30: 1, presence: 4 }
+
+    - Increase days3 to make very recent items dominate more.
+    - Increase presence to reward items that span multiple windows.
+    - Decrease days30 if old items are ranking too high.
+
+The presence bonus (max 12 for an item in all 3 windows) is roughly equivalent to
+logging an item twice in the 3-day window (score 10). This feels right — an item used
+consistently over time should compete with something used twice yesterday.

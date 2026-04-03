@@ -16,7 +16,7 @@
   background: transparent;
   color: var(--text);
   font-family: inherit;
-  font-size: clamp(0.85rem, 3.5cqw, 1rem);
+  font-size: clamp(1rem, 3.5cqw, 1.125rem);
   outline: none;
   transition: border-color 100ms;
   touch-action: manipulation;

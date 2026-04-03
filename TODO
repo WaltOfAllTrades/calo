@@ -1,1 +1,7 @@
 ios digit roll animation still not working
+
+How would you implement this, specifically around the weighting and item selection algorithm, How do you keep retrieval as fast as possible? store in another table and update async?
+
+In additionalogdetails, when item is displayed it accepts text input but also has a drop down (only engaged when down carat touched). The list of items available for selection consists of a top 25 (up to) (7 visible with scrolling). The top items are determined using an algorithm that favors item entry frequency over the last 3 days, last 7 days, and last month, as kind of a sub algo, weighted in that order, an item that appears in more sub lists should be more weighted. if remaining slots in top 25 are vacant (1 enrty each) fill with the most recent items. Items will not appear more than once in the list.
+
+Anyway to make claude render and take screenshots of app after changes so it knows what things are supposed to look like and can assess changes?

@@ -8,6 +8,8 @@ import { createMiniDailyDash } from "../features/miniDailyDash/ui/miniDailyDash.
 import { getTodayDashData } from "../features/miniDailyDash/application/getDashData.js";
 import { createAppHeader } from "../features/appHeader/ui/appHeader.js";
 import settingsIcon from "../features/settings/components/settings.svg";
+///////// This import is just to seed some test data — the function is called at the end of this file remove for production
+import { seedTestData } from "../features/calories/infrastructure/seedTestData.js";
 
 const app = document.getElementById("app");
 
@@ -72,6 +74,7 @@ bottomGroup.appendChild(
       display.setIntent(intent);
     },
     async onEnter({ intent, value }) {
+      if (value === 0) return;
       if (isLogging) {
         dash.showError("Still logging — please wait");
         return;
@@ -94,3 +97,6 @@ bottomGroup.appendChild(
 
 app.appendChild(bottomGroup);
 applyFieldVisibility();
+
+// Test data seeder — other end in src/features/calories/infrastructure/seedTestData.js
+seedTestData().then(refreshDash);

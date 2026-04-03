@@ -134,7 +134,7 @@ function buildTable(rows, hasName, hasDescription, { onDelete, onEdit }) {
   return table;
 }
 
-export function createShowLogPage({ onBack }) {
+export function createShowLogPage({ onBack, onDataChange }) {
   const root = document.createElement("div");
   root.className = "show-log";
 
@@ -180,13 +180,19 @@ export function createShowLogPage({ onBack }) {
       scrollArea.appendChild(
         buildTable(rows, hasName, hasDescription, {
           onDelete(id) {
-            deleteLogEntry(id).then(renderLog);
+            deleteLogEntry(id).then(() => {
+              renderLog();
+              onDataChange?.();
+            });
           },
           onEdit(entry) {
             const card = createEditEntryCard({
               entry,
               onSave(fields) {
-                updateLogEntry(entry.id, fields).then(renderLog);
+                updateLogEntry(entry.id, fields).then(() => {
+                  renderLog();
+                  onDataChange?.();
+                });
               },
               onCancel() {}
             });

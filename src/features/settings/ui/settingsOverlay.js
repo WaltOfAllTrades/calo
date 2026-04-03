@@ -44,7 +44,8 @@ export function createSettingsOverlay({ onClose, onDataChange }) {
       const logPage = createShowLogPage({
         onBack() {
           logPage.remove();
-        }
+        },
+        onDataChange
       });
       document.body.appendChild(logPage);
     });
