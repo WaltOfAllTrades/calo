@@ -23,6 +23,10 @@ function openSettings() {
     onClose() {
       overlay.remove();
       applyFieldVisibility();
+      refreshDash();
+    },
+    onDataChange() {
+      refreshDash();
     }
   });
   document.body.appendChild(overlay);

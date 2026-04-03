@@ -1,5 +1,7 @@
 import { createAppHeader } from "../../appHeader/ui/appHeader.js";
 import { getTodayLog } from "../application/getTodayLog.js";
+import { deleteLogEntry, updateLogEntry } from "../application/manageLogEntry.js";
+import { createEditEntryCard } from "../components/editEntryCard.js";
 import backIcon from "../../aboutPage/components/back.svg";
 
 function formatTime(isoString) {
@@ -10,7 +12,7 @@ function formatTime(isoString) {
   });
 }
 
-function buildTable(rows, hasName, hasDescription) {
+function buildTable(rows, hasName, hasDescription, { onDelete, onEdit }) {
   const table = document.createElement("table");
   table.className = "show-log__table";
 
@@ -30,8 +32,20 @@ function buildTable(rows, hasName, hasDescription) {
   table.appendChild(thead);
 
   const tbody = document.createElement("tbody");
+  let activeRow = null;
+
+  function dismissActive() {
+    if (!activeRow) return;
+    const actions = activeRow.querySelector(".show-log__row-actions");
+    if (actions) actions.remove();
+    activeRow.classList.remove("is-active");
+    activeRow = null;
+  }
+
   for (const row of rows) {
     const tr = document.createElement("tr");
+    tr.className = "show-log__row";
+    tr.dataset.id = row.id;
 
     const timeTd = document.createElement("td");
     timeTd.textContent = formatTime(row.createdOn);
@@ -59,6 +73,63 @@ function buildTable(rows, hasName, hasDescription) {
     tbody.appendChild(tr);
   }
   table.appendChild(tbody);
+
+  // Delegated tap on row
+  tbody.addEventListener("click", (e) => {
+    const tr = e.target.closest(".show-log__row");
+    if (!tr) return;
+
+    if (e.target.closest(".show-log__action-btn")) return;
+
+    if (tr === activeRow) {
+      dismissActive();
+      return;
+    }
+
+    dismissActive();
+    activeRow = tr;
+    tr.classList.add("is-active");
+
+    const id = Number(tr.dataset.id);
+    const entry = rows.find((r) => r.id === id);
+
+    const actionsBar = document.createElement("div");
+    actionsBar.className = "show-log__row-actions";
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "show-log__action-btn show-log__action-btn--edit";
+    editBtn.setAttribute("aria-label", "Edit entry");
+    editBtn.textContent = "✎";
+    editBtn.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      dismissActive();
+      onEdit(entry);
+    });
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "show-log__action-btn show-log__action-btn--delete";
+    deleteBtn.setAttribute("aria-label", "Delete entry");
+    deleteBtn.textContent = "✕";
+    deleteBtn.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      dismissActive();
+      onDelete(entry.id);
+    });
+
+    actionsBar.appendChild(editBtn);
+    actionsBar.appendChild(deleteBtn);
+
+    // Overlay on the last cell of the row
+    const lastTd = tr.lastElementChild;
+    lastTd.style.position = "relative";
+    lastTd.appendChild(actionsBar);
+  });
+
+  // Outside tap dismisses active row
+  document.addEventListener("click", (e) => {
+    if (!activeRow) return;
+    if (!table.contains(e.target)) dismissActive();
+  }, { capture: true });
 
   return table;
 }
@@ -99,14 +170,34 @@ export function createShowLogPage({ onBack }) {
   body.appendChild(scrollArea);
   root.appendChild(body);
 
-  getTodayLog().then(({ rows, hasName, hasDescription }) => {
-    scrollArea.innerHTML = "";
-    if (rows.length === 0) {
-      scrollArea.appendChild(empty);
-      return;
-    }
-    scrollArea.appendChild(buildTable(rows, hasName, hasDescription));
-  });
+  function renderLog() {
+    getTodayLog().then(({ rows, hasName, hasDescription }) => {
+      scrollArea.innerHTML = "";
+      if (rows.length === 0) {
+        scrollArea.appendChild(empty);
+        return;
+      }
+      scrollArea.appendChild(
+        buildTable(rows, hasName, hasDescription, {
+          onDelete(id) {
+            deleteLogEntry(id).then(renderLog);
+          },
+          onEdit(entry) {
+            const card = createEditEntryCard({
+              entry,
+              onSave(fields) {
+                updateLogEntry(entry.id, fields).then(renderLog);
+              },
+              onCancel() {}
+            });
+            document.body.appendChild(card);
+          }
+        })
+      );
+    });
+  }
+
+  renderLog();
 
   return root;
 }

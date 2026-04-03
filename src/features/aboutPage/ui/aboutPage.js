@@ -26,7 +26,7 @@ export function createAboutPage({ onBack }) {
 
   const tagline = document.createElement("p");
   tagline.className = "about-page__tagline";
-  tagline.textContent = "And 3-second calorie tracking rocks.";
+  tagline.textContent = "And 3-second calorie logging rocks.";
 
   const contentWrapper = document.createElement("div");
   contentWrapper.innerHTML = aboutContentHtml;

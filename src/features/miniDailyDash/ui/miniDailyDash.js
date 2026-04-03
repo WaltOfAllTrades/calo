@@ -140,9 +140,9 @@ export function createMiniDailyDash() {
     if (!ready) {
       ready = true;
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          root.classList.remove("is-initial");
-        });
+        root.classList.remove("is-initial");
+        // Force layout reflow so iOS applies transition before next transform change
+        void root.offsetHeight;
       });
     }
   }
@@ -150,12 +150,12 @@ export function createMiniDailyDash() {
   return {
     root: wrapper,
     setLogged(value) {
-      renderNumber(loggedCounter, value, loggedSlots);
       enableTransitions();
+      renderNumber(loggedCounter, value, loggedSlots);
     },
     setRemaining(value) {
-      renderNumber(remainingCounter, value, remainingSlots);
       enableTransitions();
+      renderNumber(remainingCounter, value, remainingSlots);
     },
     showError(msg) {
       errorEl.textContent = msg;

@@ -1,8 +1,9 @@
 import { loadSettings, saveSetting } from "../application/settingsService.js";
 import { createAboutPage } from "../../aboutPage/ui/aboutPage.js";
 import { createShowLogPage } from "../../showLog/ui/showLog.js";
+import { clearTodayLog, hasTodayEntries } from "../../calories/application/clearTodayLog.js";
 
-export function createSettingsOverlay({ onClose }) {
+export function createSettingsOverlay({ onClose, onDataChange }) {
   const overlay = document.createElement("div");
   overlay.className = "settings-overlay";
 
@@ -89,6 +90,7 @@ export function createSettingsOverlay({ onClose }) {
     card.appendChild(
       createTargetRow(settings.dailyTarget, async (val) => {
         await saveSetting("dailyTarget", val);
+        onDataChange?.();
       })
     );
 
@@ -98,6 +100,12 @@ export function createSettingsOverlay({ onClose }) {
     closeBtn.textContent = "Done";
     closeBtn.addEventListener("click", onClose);
     card.appendChild(closeBtn);
+
+    // Clear daily log button (only if entries exist)
+    const hasEntries = await hasTodayEntries();
+    if (hasEntries) {
+      card.appendChild(createClearLogButton(onDataChange));
+    }
   }
 
   render();
@@ -159,4 +167,32 @@ function createTargetRow(value, onChange) {
   row.appendChild(text);
   row.appendChild(input);
   return row;
+}
+
+function createClearLogButton(onDataChange) {
+  const btn = document.createElement("button");
+  btn.className = "settings-card__clear-log";
+  btn.textContent = "Clear daily log";
+
+  let confirming = false;
+
+  btn.addEventListener("click", async () => {
+    if (!confirming) {
+      confirming = true;
+      btn.textContent = "Tap to confirm removal";
+      btn.classList.add("is-confirming");
+      return;
+    }
+
+    await clearTodayLog();
+    onDataChange?.();
+    btn.textContent = "Daily log cleared";
+    btn.classList.remove("is-confirming");
+    btn.classList.add("is-cleared");
+    btn.disabled = true;
+
+    setTimeout(() => btn.remove(), 1200);
+  });
+
+  return btn;
 }

@@ -94,3 +94,148 @@
 .show-log__cal-cell--neg {
   color: #ef4444;
 }
+
+/* Row interaction */
+
+.show-log__row {
+  touch-action: manipulation;
+}
+
+.show-log__row.is-active {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.show-log__row-actions {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding-inline-start: 1.5rem;
+  padding-inline-end: 0.2rem;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--bg) 35%
+  );
+  pointer-events: auto;
+}
+
+.show-log__action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 2rem;
+  min-block-size: 2rem;
+  border: none;
+  border-radius: 0.3rem;
+  background: transparent;
+  color: var(--text);
+  font-size: clamp(0.9rem, 3.6vw, 1.1rem);
+  touch-action: manipulation;
+  padding: 0;
+}
+
+.show-log__action-btn:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.show-log__action-btn--delete {
+  color: #ef4444;
+}
+
+/* Edit entry overlay */
+
+.edit-entry-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: grid;
+  place-items: center;
+  z-index: 200;
+}
+
+.edit-entry-card {
+  inline-size: min(88vw, 340px);
+  background: var(--bg, #020617);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.edit-entry-card__title {
+  margin: 0;
+  font-size: clamp(1.1rem, 4.5vw, 1.35rem);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.edit-entry-card__label {
+  font-size: clamp(0.75rem, 3vw, 0.85rem);
+  font-weight: 500;
+  color: color-mix(in hsl, var(--text), transparent 35%);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.edit-entry-card__input {
+  inline-size: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid color-mix(in hsl, var(--text), transparent 75%);
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: clamp(0.85rem, 3.5vw, 1rem);
+  outline: none;
+  transition: border-color 100ms;
+}
+
+.edit-entry-card__input:focus {
+  border-color: color-mix(in hsl, var(--text), transparent 40%);
+}
+
+.edit-entry-card__textarea {
+  resize: none;
+  line-height: 1.4;
+}
+
+.edit-entry-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-block-start: 0.25rem;
+}
+
+.edit-entry-card__btn {
+  flex: 1;
+  padding-block: 0.6rem;
+  border-radius: 0.5rem;
+  font-size: clamp(0.85rem, 3.4vw, 0.95rem);
+  font-weight: 600;
+  touch-action: manipulation;
+  border: none;
+}
+
+.edit-entry-card__btn--cancel {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text);
+}
+
+.edit-entry-card__btn--cancel:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.edit-entry-card__btn--save {
+  background: var(--intent-active, #ff8a14);
+  color: #fff;
+}
+
+.edit-entry-card__btn--save:active {
+  filter: brightness(0.85);
+}

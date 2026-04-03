@@ -9,7 +9,7 @@ export async function getTodayDashData() {
     loadSettings()
   ]);
 
-  const logged = Math.max(0, rows.reduce((sum, r) => sum + r.calories, 0));
+  const logged = rows.reduce((sum, r) => sum + r.calories, 0);
   const remaining = settings.dailyTarget - logged;
 
   return { logged, remaining };

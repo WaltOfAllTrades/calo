@@ -151,6 +151,36 @@
   filter: brightness(0.85);
 }
 
+/* Clear daily log button */
+
+.settings-card__clear-log {
+  inline-size: 100%;
+  padding-block: 0.6rem;
+  margin-block-start: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: color-mix(in hsl, var(--text), transparent 30%);
+  font-size: clamp(0.8rem, 3.2vw, 0.9rem);
+  font-weight: 500;
+  touch-action: manipulation;
+  transition: border-color 100ms, color 100ms;
+}
+
+.settings-card__clear-log:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.settings-card__clear-log.is-confirming {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.settings-card__clear-log.is-cleared {
+  border-color: transparent;
+  color: color-mix(in hsl, var(--text), transparent 50%);
+}
+
 /* Focus */
 
 :focus-visible {
