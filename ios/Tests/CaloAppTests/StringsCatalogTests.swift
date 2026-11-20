@@ -17,7 +17,7 @@ struct StringsCatalogTests {
         L10n.calo.logDelete, L10n.calo.editTitle, L10n.calo.editCalories, L10n.calo.editName, L10n.calo.editDetails,
         L10n.calo.editCancel, L10n.calo.editSave, L10n.calo.aboutQuote, L10n.calo.aboutTagline, L10n.calo.aboutBody,
         L10n.calo.a11yKeyAdd, L10n.calo.a11yKeySubtract, L10n.calo.a11yKeyBackspace, L10n.calo.a11yKeyEnter,
-        L10n.calo.a11yKeyClear, L10n.calo.a11ySettings, L10n.calo.a11yBack,
+        L10n.calo.a11yKeyClear, L10n.calo.a11ySettings, L10n.calo.a11yBack, L10n.calo.a11yBuffer,
         L10n.shared.experimentsTitle, L10n.shared.experimentsOpenAs, L10n.shared.experimentsOpenAsFooter,
         L10n.shared.productCalo, L10n.shared.productCalculator,
     ]

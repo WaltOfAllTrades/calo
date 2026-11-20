@@ -147,19 +147,16 @@ struct CaloHeader: View {
             Text(L10n.calo.brand)
                 .font(.title2.weight(.bold))
                 .lineLimit(1)
-            Spacer(minLength: 0)
-            ViewThatFits(in: .horizontal) {
-                Text(DateText.headerFull(date))
-                Text(DateText.headerMedium(date))
-                Text(DateText.headerShort(date))
-            }
-            .font(.subheadline)
-            .foregroundStyle(Tokens.color.textFaint)
-            .lineLimit(2)
-            .minimumScaleFactor(0.8)
-            .multilineTextAlignment(.center)
-            .accessibilityIdentifier("calo.header.date")
-            Spacer(minLength: 0)
+                .fixedSize()
+            // One date variant at its natural size (the web app's medium width, which fits every iPhone
+            // between the brand and the gear); nothing is fitted, scaled or clipped.
+            Text(DateText.headerMedium(date))
+                .font(.subheadline)
+                .foregroundStyle(Tokens.color.textFaint)
+                .lineLimit(1)
+                .fixedSize()
+                .frame(maxWidth: .infinity)
+                .accessibilityIdentifier("calo.header.date")
             GlassCircleButton(
                 symbol: Symbols.settings,
                 label: String(localized: L10n.calo.a11ySettings),
@@ -193,14 +190,17 @@ struct DashView: View {
                 )
                 .accessibilityIdentifier("calo.dash.remaining")
             }
-            Text(error ?? "")
-                .font(.footnote)
-                .foregroundStyle(Tokens.color.negative)
-                .frame(minHeight: 18)
-                .opacity(error == nil ? 0 : 1)
-                .motion(Motion.errorFade, reduceMotion: reduceMotion, value: error == nil)
-                .accessibilityIdentifier("calo.dash.error")
-                .accessibilityHidden(error == nil)
+            // The line keeps its height when empty, but no empty text is left in the accessibility tree.
+            ZStack {
+                if let error {
+                    Text(error)
+                        .font(.footnote)
+                        .foregroundStyle(Tokens.color.negative)
+                        .accessibilityIdentifier("calo.dash.error")
+                }
+            }
+            .frame(minHeight: 18)
+            .motion(Motion.errorFade, reduceMotion: reduceMotion, value: error == nil)
         }
     }
 
@@ -209,8 +209,8 @@ struct DashView: View {
             RollingNumber(value, font: compact ? Tokens.font.displayCompact : Tokens.font.display)
             Text(label)
                 .font(Tokens.font.label)
-                .tracking(1.2)
                 .foregroundStyle(Tokens.color.textFaint)
+                .fixedSize()
         }
         .frame(maxWidth: .infinity)
         .accessibilityElement(children: .ignore)
@@ -228,14 +228,15 @@ struct EntryDisplay: View {
         HStack {
             Text(intent == .add ? L10n.calo.intentAdd : L10n.calo.intentSubtract)
                 .font(Tokens.font.intent)
-                .tracking(1)
                 .foregroundStyle(Tokens.color.accent)
+                .fixedSize()
                 .accessibilityIdentifier("calo.display.intent")
             Spacer()
             Text(buffer.isEmpty ? " " : buffer)
                 .font(Tokens.font.buffer)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(buffer)
+                .accessibilityLabel(Text(L10n.calo.a11yBuffer))
+                .accessibilityValue(buffer)
                 .accessibilityAddTraits(.isStaticText)
                 .accessibilityIdentifier("calo.display.buffer")
         }

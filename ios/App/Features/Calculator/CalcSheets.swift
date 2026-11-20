@@ -61,22 +61,27 @@ struct TapeSheet: View {
                 } else {
                     List {
                         ForEach(Array(model.tape.lines.enumerated()), id: \.element.id) { index, line in
-                            Button {
-                                model.insert(line.result)
-                                dismiss()
-                            } label: {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(line.expression).font(.footnote).foregroundStyle(Tokens.color.textFaint)
-                                        .lineLimit(1)
-                                    HStack {
-                                        Text(model.text(for: line)).font(.body.weight(.semibold)).monospacedDigit()
-                                        Spacer()
-                                        Text(DateText.time(line.date)).font(.caption)
-                                            .foregroundStyle(Tokens.color.textFaint)
-                                    }
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(line.expression).font(.footnote).foregroundStyle(Tokens.color.textFaint)
+                                    .lineLimit(1)
+                                HStack {
+                                    Text(model.text(for: line)).font(.body.weight(.semibold)).monospacedDigit()
+                                    Spacer()
+                                    Text(DateText.time(line.date)).font(.caption)
+                                        .foregroundStyle(Tokens.color.textFaint)
                                 }
                             }
-                            .buttonStyle(.plain)
+                            .contentShape(.rect)
+                            .onTapGesture {
+                                model.insert(line.result)
+                                dismiss()
+                            }
+                            .accessibilityElement(children: .combine)
+                            .accessibilityAddTraits(.isButton)
+                            .accessibilityAction {
+                                model.insert(line.result)
+                                dismiss()
+                            }
                             .accessibilityIdentifier("calc.tape.row.\(index)")
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 Button(role: .destructive) { model.deleteTapeLine(id: line.id) } label: {

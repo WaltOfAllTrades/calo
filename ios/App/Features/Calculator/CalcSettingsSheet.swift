@@ -16,63 +16,69 @@ struct CalcSettingsSheet: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    Picker(selection: $prefs.unitSystem) {
-                        Text(L10n.calc.settingsImperial).tag(UnitSystem.imperial)
-                        Text(L10n.calc.settingsMetric).tag(UnitSystem.metric)
-                    } label: { Text(L10n.calc.settingsUnitSystem) }
-                        .pickerStyle(.segmented)
-                        .accessibilityIdentifier("calc.settings.unitSystem")
-                    Picker(selection: $prefs.precision) {
-                        ForEach(Precision.allCases) { p in
-                            Text(p.label ?? String(localized: L10n.calc.chipExact)).tag(p)
+            VStack(spacing: 0) {
+                Form {
+                    Section {
+                        Picker(selection: $prefs.unitSystem) {
+                            Text(L10n.calc.settingsImperial).tag(UnitSystem.imperial)
+                            Text(L10n.calc.settingsMetric).tag(UnitSystem.metric)
+                        } label: { Text(L10n.calc.settingsUnitSystem) }
+                            .pickerStyle(.segmented)
+                            .accessibilityIdentifier("calc.settings.unitSystem")
+                        Picker(selection: $prefs.precision) {
+                            ForEach(Precision.allCases) { p in
+                                Text(p.label ?? String(localized: L10n.calc.chipExact)).tag(p)
+                            }
+                        } label: { Text(L10n.calc.settingsPrecision) }
+                            .accessibilityIdentifier("calc.settings.precision")
+                        Picker(selection: $prefs.look) {
+                            ForEach(Look.allCases) { look in Text(lookName(look)).tag(look) }
+                        } label: { Text(L10n.calc.settingsLook) }
+                            .accessibilityIdentifier("calc.settings.look")
+                    }
+                    Section {
+                        lengthRow(L10n.calc.fieldRiser, text: $riserText, id: "riser")
+                        lengthRow(L10n.calc.fieldTread, text: $treadText, id: "tread")
+                        lengthRow(L10n.calc.fieldHeadroom, text: $headroomText, id: "headroom")
+                        lengthRow(L10n.calc.fieldFloorThickness, text: $floorText, id: "floorThickness")
+                        Toggle(isOn: $prefs.riserLimited) { Text(L10n.calc.fieldRiserLimited) }
+                            .accessibilityIdentifier("calc.settings.riserLimited")
+                    } header: { Text(L10n.calc.settingsStairs) }
+                    Section {
+                        Stepper(value: $prefs.wastePercent, in: 0 ... 50) {
+                            LabeledContent { Text("\(prefs.wastePercent) %") } label: { Text(L10n.calc.fieldWaste) }
                         }
-                    } label: { Text(L10n.calc.settingsPrecision) }
-                        .accessibilityIdentifier("calc.settings.precision")
-                    Picker(selection: $prefs.look) {
-                        ForEach(Look.allCases) { look in Text(lookName(look)).tag(look) }
-                    } label: { Text(L10n.calc.settingsLook) }
-                        .accessibilityIdentifier("calc.settings.look")
-                }
-                Section {
-                    lengthRow(L10n.calc.fieldRiser, text: $riserText, id: "riser")
-                    lengthRow(L10n.calc.fieldTread, text: $treadText, id: "tread")
-                    lengthRow(L10n.calc.fieldHeadroom, text: $headroomText, id: "headroom")
-                    lengthRow(L10n.calc.fieldFloorThickness, text: $floorText, id: "floorThickness")
-                    Toggle(isOn: $prefs.riserLimited) { Text(L10n.calc.fieldRiserLimited) }
-                        .accessibilityIdentifier("calc.settings.riserLimited")
-                } header: { Text(L10n.calc.settingsStairs) }
-                Section {
-                    Stepper(value: $prefs.wastePercent, in: 0 ... 50) {
-                        LabeledContent { Text("\(prefs.wastePercent) %") } label: { Text(L10n.calc.fieldWaste) }
+                        .accessibilityIdentifier("calc.settings.waste")
+                        Picker(selection: $prefs.bagPounds) {
+                            ForEach(CalcPreferences.bagSizes, id: \.self) { size in Text("\(size) lb").tag(size) }
+                        } label: { Text(L10n.calc.fieldBag) }
+                            .accessibilityIdentifier("calc.settings.bag")
+                    } header: { Text(L10n.calc.settingsConcrete) }
+                    Section {
+                        lengthRow(L10n.calc.fieldSpacing, text: $spacingText, id: "spacing")
+                    } header: { Text(L10n.calc.settingsSpacing) }
+                    Section {
+                        NavigationLink { CalcAboutScreen() } label: { Text(L10n.calc.settingsAbout) }
+                            .accessibilityIdentifier("calc.settings.about")
+                        NavigationLink { ExperimentsScreen() } label: {
+                            HStack(spacing: Tokens.spacing.stack) {
+                                Image(systemName: Symbols.experiments).accessibilityHidden(true)
+                                Text(L10n.calc.settingsExperiments)
+                            }
+                        }
+                        .accessibilityIdentifier("calc.settings.experiments")
                     }
-                    .accessibilityIdentifier("calc.settings.waste")
-                    Picker(selection: $prefs.bagPounds) {
-                        ForEach(CalcPreferences.bagSizes, id: \.self) { size in Text("\(size) lb").tag(size) }
-                    } label: { Text(L10n.calc.fieldBag) }
-                        .accessibilityIdentifier("calc.settings.bag")
-                } header: { Text(L10n.calc.settingsConcrete) }
-                Section {
-                    lengthRow(L10n.calc.fieldSpacing, text: $spacingText, id: "spacing")
-                } header: { Text(L10n.calc.settingsSpacing) }
-                Section {
-                    NavigationLink { CalcAboutScreen() } label: { Text(L10n.calc.settingsAbout) }
-                        .accessibilityIdentifier("calc.settings.about")
-                    NavigationLink { ExperimentsScreen() } label: {
-                        Label { Text(L10n.calc.settingsExperiments) } icon: { Image(systemName: Symbols.experiments) }
-                    }
-                    .accessibilityIdentifier("calc.settings.experiments")
                 }
+                Button { dismiss() } label: {
+                    Text(L10n.calo.settingsDone).frame(maxWidth: .infinity).frame(minHeight: Tokens.size.control)
+                }
+                .buttonStyle(.borderedProminent)
+                .accessibilityIdentifier("calc.settings.done")
+                .padding(.horizontal, Tokens.spacing.screen)
+                .padding(.vertical, Tokens.spacing.stack)
             }
             .navigationTitle(Text(L10n.calc.settingsTitle))
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button { dismiss() } label: { Text(L10n.calo.settingsDone) }
-                        .accessibilityIdentifier("calc.settings.done")
-                }
-            }
         }
         .presentationDetents([.medium, .large])
         .task {

@@ -128,6 +128,7 @@ struct FunctionDetailScreen: View {
             .accessibilityLabel(Text(L10n.calc.fnUse))
             .accessibilityIdentifier("calc.fn.\(spec.id).use.\(result.id)")
         }
+        .accessibilityElement(children: .contain)
     }
 
     private func text(for result: FunctionResult) -> String {

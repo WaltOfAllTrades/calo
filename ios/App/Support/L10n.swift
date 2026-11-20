@@ -48,6 +48,7 @@ enum L10n {
         static let a11yKeyClear = LocalizedStringResource("calo.a11y.key.clear")
         static let a11ySettings = LocalizedStringResource("calo.a11y.settings")
         static let a11yBack = LocalizedStringResource("calo.a11y.back")
+        static let a11yBuffer = LocalizedStringResource("calo.a11y.buffer")
 
         static func a11yDashLogged(_ value: Int) -> String {
             String(localized: "calo.a11y.dash.logged \(value.formatted())")

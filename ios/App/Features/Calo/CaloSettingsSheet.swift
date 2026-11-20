@@ -24,70 +24,65 @@ struct CaloSettingsSheet: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            List {
-                Section {
-                    NavigationLink(value: Destination.log) {
-                        Text(L10n.calo.settingsTodayLog)
-                    }
-                    .accessibilityIdentifier("calo.settings.todayLog")
-                    NavigationLink(value: Destination.about) {
-                        Text(L10n.calo.settingsAbout)
-                    }
-                    .accessibilityIdentifier("calo.settings.about")
-                }
-                Section {
-                    Toggle(isOn: $settings.showName) { Text(L10n.calo.settingsShowName) }
-                        .accessibilityIdentifier("calo.settings.showName")
-                    Toggle(isOn: $settings.showDetails) { Text(L10n.calo.settingsShowDetails) }
-                        .accessibilityIdentifier("calo.settings.showDetails")
-                }
-                Section {
-                    HStack {
-                        Text(L10n.calo.settingsTarget)
-                        Spacer()
-                        TextField(String(localized: L10n.calo.settingsTarget), text: $targetText)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(maxWidth: 120)
-                            .focused($targetFocused)
-                            .onSubmit(commitTarget)
-                            .accessibilityLabel(Text(L10n.calo.settingsTarget))
-                            .accessibilityIdentifier("calo.settings.target")
-                    }
-                }
-                Section {
-                    NavigationLink(value: Destination.experiments) {
-                        Label { Text(L10n.calo.settingsExperiments) } icon: { Image(systemName: Symbols.experiments) }
-                    }
-                    .accessibilityIdentifier("calo.settings.experiments")
-                }
-                if hasEntries {
+            VStack(spacing: 0) {
+                List {
                     Section {
-                        TwoTapButton(
-                            String(localized: L10n.calo.settingsClear),
-                            confirmTitle: String(localized: L10n.calo.settingsClearConfirm),
-                            doneTitle: String(localized: L10n.calo.settingsClearDone),
-                            glass: false,
-                            action: {
-                                try? await env.store.clear(in: dash.window)
-                                await dash.refresh()
-                                try? await Task.sleep(for: Motion.clearedLinger)
-                                hasEntries = false
+                        NavigationLink(value: Destination.log) {
+                            Text(L10n.calo.settingsTodayLog)
+                        }
+                        .accessibilityIdentifier("calo.settings.todayLog")
+                        NavigationLink(value: Destination.about) {
+                            Text(L10n.calo.settingsAbout)
+                        }
+                        .accessibilityIdentifier("calo.settings.about")
+                    }
+                    Section {
+                        Toggle(isOn: $settings.showName) { Text(L10n.calo.settingsShowName) }
+                            .accessibilityIdentifier("calo.settings.showName")
+                        Toggle(isOn: $settings.showDetails) { Text(L10n.calo.settingsShowDetails) }
+                            .accessibilityIdentifier("calo.settings.showDetails")
+                    }
+                    Section {
+                        HStack {
+                            Text(L10n.calo.settingsTarget)
+                            Spacer()
+                            TextField("", text: $targetText)
+                                .keyboardType(.numberPad)
+                                .multilineTextAlignment(.trailing)
+                                .focused($targetFocused)
+                                .onSubmit(commitTarget)
+                                .accessibilityLabel(Text(L10n.calo.settingsTarget))
+                                .accessibilityIdentifier("calo.settings.target")
+                        }
+                    }
+                    Section {
+                        NavigationLink(value: Destination.experiments) {
+                            // Plain text beside the symbol: a `Label` here is drawn but not exposed to accessibility.
+                            HStack(spacing: Tokens.spacing.stack) {
+                                Image(systemName: Symbols.experiments).accessibilityHidden(true)
+                                Text(L10n.calo.settingsExperiments)
                             }
-                        )
-                        .accessibilityIdentifier("calo.settings.clear")
-                        .listRowBackground(Color.clear)
+                        }
+                        .accessibilityIdentifier("calo.settings.experiments")
                     }
                 }
+                // Footer below the list, never an overlay: rows must not be drawn under it. Done lives here
+                // (not in the bar) because bar buttons do not scale with Dynamic Type.
+                HStack(spacing: Tokens.spacing.stack) {
+                    if hasEntries {
+                        clearButton
+                    }
+                    Button { commitTarget(); dismiss() } label: {
+                        Text(L10n.calo.settingsDone).frame(maxWidth: .infinity).frame(minHeight: Tokens.size.control)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .accessibilityIdentifier("calo.settings.done")
+                }
+                .padding(.horizontal, Tokens.spacing.screen)
+                .padding(.vertical, Tokens.spacing.stack)
             }
             .navigationTitle(Text(L10n.calo.brand))
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button { commitTarget(); dismiss() } label: { Text(L10n.calo.settingsDone) }
-                        .accessibilityIdentifier("calo.settings.done")
-                }
-            }
             .navigationDestination(for: Destination.self) { destination in
                 switch destination {
                 case .log: TodayLogScreen(dash: dash)
@@ -120,6 +115,22 @@ struct CaloSettingsSheet: View {
             loaded = true
             await reloadHasEntries()
         }
+    }
+
+    private var clearButton: some View {
+        TwoTapButton(
+            String(localized: L10n.calo.settingsClear),
+            confirmTitle: String(localized: L10n.calo.settingsClearConfirm),
+            doneTitle: String(localized: L10n.calo.settingsClearDone),
+            glass: false,
+            action: {
+                try? await env.store.clear(in: dash.window)
+                await dash.refresh()
+                try? await Task.sleep(for: Motion.clearedLinger)
+                hasEntries = false
+            }
+        )
+        .accessibilityIdentifier("calo.settings.clear")
     }
 
     private func reloadHasEntries() async {

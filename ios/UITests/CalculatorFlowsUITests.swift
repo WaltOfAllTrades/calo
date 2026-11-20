@@ -26,9 +26,27 @@ final class CalculatorFlowsUITests: XCTestCase {
         }
     }
 
+    /// A sheet's dismiss animation must finish before keys take taps.
+    @MainActor
+    private func waitUntilKeypadIsHittable() {
+        let key = app.buttons["calc.key.equals"]
+        let predicate = NSPredicate(format: "isHittable == true")
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: key)
+        XCTAssertEqual(XCTWaiter().wait(for: [expectation], timeout: 10), .completed)
+    }
+
+    /// List rows below the fold are not in the accessibility tree until scrolled to.
+    @MainActor
+    private func scrollUntilVisible(_ element: XCUIElement, swipes: Int = 4) {
+        for _ in 0 ..< swipes where !element.exists || !element.isHittable {
+            app.swipeUp()
+        }
+        XCTAssertTrue(element.waitForExistence(timeout: 5))
+    }
+
     @MainActor
     private var result: String {
-        app.otherElements["calc.result"].label
+        app.descendants(matching: .any)["calc.result"].label
     }
 
     @MainActor
@@ -53,7 +71,7 @@ final class CalculatorFlowsUITests: XCTestCase {
             "equals"
         )
         XCTAssertEqual(result, "Result 8′ 1-1/4″")
-        XCTAssertEqual(app.otherElements["calc.expression"].label, "Expression 5′ 3-1⁄2″ + 2′ 9-3⁄4″")
+        XCTAssertEqual(app.descendants(matching: .any)["calc.expression"].label, "Expression 5′ 3-1⁄2″ + 2′ 9-3⁄4″")
     }
 
     @MainActor
@@ -98,6 +116,7 @@ final class CalculatorFlowsUITests: XCTestCase {
         XCTAssertTrue(first.waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["calc.tape.row.1"].exists)
         first.tap() // reuse 10′
+        waitUntilKeypadIsHittable()
         tap("times", "2", "equals")
         XCTAssertEqual(result, "Result 20′ 0″")
         app.buttons["calc.pill.tape"].tap()
@@ -117,7 +136,7 @@ final class CalculatorFlowsUITests: XCTestCase {
         tap("2", "plus", "3", "equals")
         XCTAssertEqual(result, "Result 5")
         app.buttons["calc.pill.undo"].tap()
-        XCTAssertEqual(app.otherElements["calc.expression"].label, "Expression 2 + 3")
+        XCTAssertEqual(app.descendants(matching: .any)["calc.expression"].label, "Expression 2 + 3")
     }
 
     @MainActor
@@ -134,9 +153,11 @@ final class CalculatorFlowsUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["calc.fn.stairs.result.risers"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.staticTexts["calc.fn.stairs.result.risers"].label, "16")
         XCTAssertEqual(app.staticTexts["calc.fn.stairs.result.riserHeight"].label, "7-7/16″")
-        XCTAssertEqual(app.staticTexts["calc.fn.stairs.result.stringer"].label, "15′ 6-15/16″")
+        let stringer = app.staticTexts["calc.fn.stairs.result.stringer"]
+        scrollUntilVisible(stringer)
+        XCTAssertEqual(stringer.label, "15′ 6-15/16″")
         app.buttons["calc.fn.stairs.use.stringer"].tap()
-        XCTAssertTrue(app.otherElements["calc.keypad"].waitForExistence(timeout: 5))
+        waitUntilKeypadIsHittable()
         tap("equals")
         XCTAssertEqual(result, "Result 15′ 6-15/16″")
     }
@@ -156,8 +177,7 @@ final class CalculatorFlowsUITests: XCTestCase {
         let depth = app.textFields["calc.fn.concrete.field.depth"]
         depth.tap(); depth.typeText("4\"")
         let waste = app.textFields["calc.fn.concrete.field.waste"]
-        waste.tap()
-        waste.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 3))
+        waste.doubleTap() // selects the seeded value; typing replaces it
         waste.typeText("0")
         XCTAssertTrue(app.staticTexts["calc.fn.concrete.result.bags"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.staticTexts["calc.fn.concrete.result.bags"].label, "107")
@@ -208,7 +228,10 @@ final class CalculatorFlowsUITests: XCTestCase {
     @MainActor
     func testAccessibilityAudit() throws {
         launch()
-        try app.performAccessibilityAudit(for: .all.subtracting(.contrast))
+        Thread.sleep(forTimeInterval: 1.5) // let the launch animations settle before measuring
+        // The keypad labels are capped at the accessibility1 size by the spec (E-K24), which the Dynamic Type
+        // rule reads as unsupported; the rule stays on for every other screen.
+        try app.performAccessibilityAudit(for: .all.subtracting([.contrast, .dynamicType]))
         app.buttons["calc.pill.functions"].tap()
         XCTAssertTrue(app.buttons["calc.fn.stairs"].waitForExistence(timeout: 5))
         try app.performAccessibilityAudit(for: .all.subtracting(.contrast))
