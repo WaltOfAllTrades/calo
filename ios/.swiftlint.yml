@@ -1,0 +1,26 @@
+included:
+  - App
+  - Packages
+  - Tests
+  - UITests
+excluded:
+  - .derivedData
+  - .build
+  - build
+  - spec
+  - research
+  - Packages/*/.build
+disabled_rules:
+  - trailing_comma        # swiftformat owns comma style
+identifier_name:
+  min_length: 1
+  max_length: 50
+type_name:
+  min_length: 3
+  max_length: 60
+  allowed_symbols: ["_"]
+  # Lower-case nested namespaces are the spec's spelling: Tokens.color.accent, L10n.calo.brand, Motion entries.
+  excluded: [color, radius, size, spacing, font, calo, calc, a11y, settings, log, edit, about, dash, key, intent, error, field, shared, tape, unit, memory, functions]
+line_length:
+  warning: 120
+  error: 140

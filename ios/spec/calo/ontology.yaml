@@ -1,0 +1,107 @@
+# =====================================================================
+# Calo (native) — Ontology
+# Conventions: IDs start with "#", lowercase, hyphen joins words, dot marks a kind/member.
+# "term" is the INTERNAL name (docs + code); "label" is user-facing text (copy.md).
+# Code names: #entry.intent.subtract -> Entry.Intent.subtract
+# =====================================================================
+terms:
+  - id: "#entry"
+    term: Entry
+    definition: One logged amount of calories at a moment, with an optional name and details. Stored in CaloKit.
+    fields: [id, calories (signed Int), name, details, createdAt, updatedAt]
+  - id: "#entry.intent"
+    term: Intent
+    definition: Whether the next entry adds or subtracts calories. Resets to add after every enter.
+  - id: "#entry.intent.add"
+    term: Add
+    label: ADD
+  - id: "#entry.intent.subtract"
+    term: Subtract
+    label: SUB
+  - id: "#entry.signed-calories"
+    term: Signed calories
+    definition: The stored value. add → +value, subtract → −value. The only place the sign rule lives (code-standards 5).
+
+  - id: "#keypad"
+    term: Keypad
+    definition: 4×5 grid of keys that builds the buffer and chooses the intent. Layout in screens.md.
+  - id: "#keypad.buffer"
+    term: Buffer
+    definition: The digits typed so far, at most 5 characters. A key that would make it longer is ignored.
+  - id: "#keypad.key"
+    term: Key
+    definition: One glass key. Kinds below.
+  - id: "#keypad.key.digit"
+    term: Digit key
+    definition: 0–9 and "00"; appends to the buffer.
+  - id: "#keypad.key.bonus"
+    term: Bonus key
+    definition: 80, 60, 40, 20: appends two digits at once (the web app's quick values).
+  - id: "#keypad.key.intent"
+    term: Intent key
+    definition: "+" and "−": sets the intent; the active one is prominent.
+  - id: "#keypad.key.clear"
+    term: Clear key
+    label: C
+    definition: Empties the buffer.
+  - id: "#keypad.key.backspace"
+    term: Backspace key
+    definition: Removes the last character of the buffer.
+  - id: "#keypad.key.enter"
+    term: Enter key
+    definition: Logs the buffer with the intent, name and details; then clears buffer and fields and resets intent.
+
+  - id: "#dash"
+    term: Dash
+    definition: The two rolling numbers above the keypad: logged and remaining for today, plus the error line.
+  - id: "#dash.logged"
+    term: Logged
+    label: LOGGED
+    definition: Sum of today's signed calories.
+  - id: "#dash.remaining"
+    term: Remaining
+    label: REMAINING
+    definition: dailyTarget − logged. May be negative; shown with a minus sign.
+  - id: "#dash.error"
+    term: Error line
+    definition: One-line message under the dash, shown for Motion.errorFade then cleared.
+
+  - id: "#details"
+    term: Details fields
+    definition: The optional Item and Log details fields above the entry display; visible per settings.
+  - id: "#display"
+    term: Entry display
+    definition: Intent label left, buffer right.
+
+  - id: "#day-window"
+    term: Day window
+    definition: The [start of today, start of tomorrow) interval in the device calendar and time zone. The single definition of "today".
+  - id: "#day-window.rollover"
+    term: Rollover
+    definition: At the first moment of a new day, or on return to the foreground on a new day, the header date and the dash recompute.
+
+  - id: "#settings"
+    term: Settings
+    definition: dailyTarget (Int, 0…99999, default 2000), showName (false), showDetails (false). Codable JSON in UserDefaults.
+  - id: "#settings.sheet"
+    term: Settings sheet
+    definition: The screen opened by the gear; contents in screens.md.
+  - id: "#settings.clear-today"
+    term: Clear daily log
+    definition: Deletes every entry in today's day window after a two-tap confirmation. Shown only when today has entries.
+
+  - id: "#log"
+    term: Today's log
+    label: Today’s Log
+    definition: Table of today's entries, oldest first; edit and delete per row.
+  - id: "#log.edit"
+    term: Edit entry
+    definition: Sheet with calories, item, details; Save validates calories as an integer.
+
+  - id: "#about"
+    term: About
+    definition: The about page text from the web app (copy.md).
+
+  - id: "#experiments"
+    term: Experiments
+    definition: Settings section shared by both products. v1 field: openAs (calo | calculator). Each product adds its own options.

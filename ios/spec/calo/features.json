@@ -1,0 +1,49 @@
+{
+  "$comment": "Work list for Calo (native) and the shared skeleton. Flip passes to true only with scripts/pass-feature.sh after scripts/verify.sh exits 0. Never edit or delete an entry; add a note in PROGRESS.md instead. Order is build order; dependsOn must pass first.",
+  "features": [
+    { "id": "C-001", "area": "skeleton", "title": "XcodeGen project.yml with the Calo app target, three packages, unit and UI test targets, privacy manifest, strings catalog",
+      "acceptance": ["xcodegen generate succeeds", "empty app builds for the iPhone 17 simulator", "Package.swift for DesignSystem (MainActor), CaloKit and CalcKit (nonisolated), language mode 6", "CalcKit imports Foundation only; CaloKit Foundation, GRDB, OSLog (verify.sh step 2)", "PrivacyInfo.xcprivacy with the UserDefaults reason", "portrait only, iPhone only", "Localizable.xcstrings present"],
+      "tests": ["verify.sh build step"], "refs": ["architecture §2", "architecture §6"], "dependsOn": [], "passes": true },
+    { "id": "C-002", "area": "skeleton", "title": "verify.sh gate, pass-feature.sh, protect-paths hook, .claude settings",
+      "acceptance": ["verify.sh runs protected-file check, boundaries, swiftlint --strict, swiftformat --lint, xcodegen, build-for-testing, unit tests, UI tests on one simulator with parallel testing off", "exits non-zero on any failure, skip or expected failure, or a count drop against .verify/last-green.txt", "pass-feature.sh flips a C- or K- id only with a matching green stamp and passing dependsOn", "hook blocks edits under spec/, and under Tests/, UITests/, the gate files once they are on main"],
+      "tests": ["manual: verify.sh on the skeleton"], "refs": ["code-standards 12"], "dependsOn": ["C-001"], "passes": true },
+    { "id": "C-003", "area": "design", "title": "DesignSystem: Tokens, Motion, Haptics, Symbols, GlassKey, GlassCircleButton, GlassPill, RollingNumber, GlassField, TwoTapButton, CaloBackdrop, CalcBackdrop",
+      "acceptance": ["every token and motion value in design/liquid-glass.md exists by name", "Motion has a Reduce Motion branch per entry", "GlassKey roles plain, secondary, accent, prominent", "RollingNumber uses numericText and a real minus sign", "TwoTapButton arms, acts on the second tap, disarms after Motion.armTimeout", "no literal colours, radii or durations outside Tokens and Motion"],
+      "tests": ["DesignSystemTests: Motion reduce branches, TwoTapButton state machine, RollingNumber formatting"], "refs": ["design/liquid-glass.md"], "dependsOn": ["C-001"], "passes": true },
+
+    { "id": "C-010", "area": "calokit", "title": "Entry, Entry.Intent, signedCalories, DayWindow, Settings",
+      "acceptance": ["Entry fields per ontology; name and details trimmed and non-optional", "signedCalories is the only sign rule", "DayWindow(now:calendar:) gives [startOfDay, startOfNextDay)", "Settings Codable with defaults 2000 / false / false; missing and unknown keys handled"],
+      "tests": ["EntryTests", "DayWindowTests", "SettingsTests"], "refs": ["ontology", "architecture §3"], "dependsOn": ["C-001"], "passes": true },
+    { "id": "C-011", "area": "calokit", "title": "LogStore protocol, GRDB store with migration v1, in-memory store, totals",
+      "acceptance": ["add, entries(in:), totals(in:target:), update, delete, clear(in:)", "GRDB store opens a file in Application Support with completeUntilFirstUserAuthentication, or in memory for tests", "MemoryLogStore passes the same test suite", "migration v1 never edited after this feature"],
+      "tests": ["LogStoreTests", "MigrationTests"], "refs": ["architecture §3", "SPEC door-keeping 2"], "dependsOn": ["C-010"], "passes": true },
+
+    { "id": "C-020", "area": "calo", "title": "KeypadModel: buffer rules, intent, enter, busy guard, errors",
+      "acceptance": ["append with the 5-character cap for digits, 00 and bonus keys", "backspace and clear", "intent switch", "enter: empty no-op, zeros clear only, otherwise emits signed value, clears, resets intent", "busy guard shows error.busy", "failure shows error.failed and keeps state", "no SwiftUI import"],
+      "tests": ["KeypadModelTests"], "refs": ["edge-cases E-C01..E-C05", "SPEC door-keeping 4"], "dependsOn": ["C-010"], "passes": true },
+    { "id": "C-021", "area": "calo", "title": "Main screen: header with responsive date and gear, Dash with rolling numbers and error line, details fields, entry display, keypad",
+      "acceptance": ["layout per screens.md, fits 375×667 without scrolling", "keys in one GlassEffectContainer with roles per screens.md", "active intent key prominent, morphs on switch", "dash numbers roll with Motion.digitRoll, negative with U+2212", "details fields shown per settings; group removed when both hidden", "identifiers per screens.md", "no literal strings"],
+      "tests": ["NoLiteralStringsLint", "UI logsAnEntry (later)"], "refs": ["screens.md Main", "design/liquid-glass.md"], "dependsOn": ["C-003", "C-020"], "passes": true },
+    { "id": "C-022", "area": "calo", "title": "Logging flow and day rollover",
+      "acceptance": ["enter writes through LogStore with name and details, clears fields, refreshes the dash", "busy and failure paths per E-C01, E-C02", "DashModel computes logged and remaining from the store and settings", "midnight timer and foreground recompute DayWindow (E-C07, E-C08)", "database open failure does not crash (E-C14)"],
+      "tests": ["DashModelTests", "UI logsAnEntry, subtractsAnEntry, bufferCap"], "refs": ["edge-cases", "ontology #day-window"], "dependsOn": ["C-011", "C-021"], "passes": true },
+
+    { "id": "C-030", "area": "calo", "title": "Settings sheet: rows, toggles, daily target, Clear daily log",
+      "acceptance": ["medium detent with a NavigationStack", "toggles write Settings and the main screen re-applies visibility on close", "daily target numeric 0…99999, invalid leaves the value (E-C09)", "Clear daily log only when today has entries; two-tap; done state; disarms on close (E-C12)", "Done closes and refreshes the dash"],
+      "tests": ["UI settingsFieldsAndTarget, clearDailyLogTwoTap"], "refs": ["screens.md Settings"], "dependsOn": ["C-022"], "passes": true },
+    { "id": "C-031", "area": "calo", "title": "Today's Log with edit sheet and swipe delete",
+      "acceptance": ["rows oldest first with time, signed calories, conditional item and details columns", "tap opens Edit entry; Save validates integer calories (E-C10)", "swipe delete removes immediately", "empty state", "the log reflects the current DayWindow"],
+      "tests": ["UI todayLogEditDelete"], "refs": ["screens.md Today's Log, Edit entry"], "dependsOn": ["C-030"], "passes": true },
+    { "id": "C-032", "area": "calo", "title": "About page",
+      "acceptance": ["pull quote, tagline and body from copy.md", "pushed from Settings"],
+      "tests": ["UI aboutPage"], "refs": ["screens.md About"], "dependsOn": ["C-030"], "passes": true },
+
+    { "id": "C-040", "area": "shared", "title": "Experiments: Open as (Calo / Calculator) and the root switch",
+      "acceptance": ["Experiments struct in UserDefaults with openAs defaulting to calo", "Experiments screen reachable from Calo Settings and from the calculator's settings", "changing Open as switches the root immediately", "a launch argument -calo.openAs <calo|calculator> overrides for tests"],
+      "tests": ["ExperimentsRoutingTests"], "refs": ["calculator/SPEC.md Experiments"], "dependsOn": ["C-030"], "passes": true },
+
+    { "id": "C-050", "area": "calo", "title": "UI test suite, accessibility audit, iPad smoke, refresh-device.sh, briefing",
+      "acceptance": ["every UI test in tests.md green", "audit without the contrast rule on glass screens; measured contrast logged", "iPad launch smoke", "scripts/refresh-device.sh builds and installs with the fixed bundle ID and team", "SETUP_STATUS.md holds the resume point and the refresh command"],
+      "tests": ["UITests/CaloFlowsUITests", "UITests/LaunchSmokeUITests"], "refs": ["tests.md UI"], "dependsOn": ["C-031", "C-032", "C-040"], "passes": true }
+  ]
+}

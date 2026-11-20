@@ -1,0 +1,105 @@
+# =====================================================================
+# Construction calculator — Ontology
+# Conventions as in calo/ontology.yaml. Code names: #dimension.kind.area -> Dimension.Kind.area
+# =====================================================================
+terms:
+  - id: "#fraction"
+    term: Fraction
+    definition: Exact rational number (Int numerator, positive Int denominator, reduced). The arithmetic type everywhere.
+
+  - id: "#dimension"
+    term: Dimension
+    definition: A Fraction value with a kind. Lengths are stored in inches, areas in square inches, volumes in cubic inches, angles in degrees, scalars bare. 1 in = 25.4 mm exactly, so metric is exact too.
+  - id: "#dimension.kind"
+    term: Kind
+    definition: scalar | length | area | volume | angle. Arithmetic between kinds follows the dimensional algebra in formulas.md §1.
+
+  - id: "#unit"
+    term: Unit
+    definition: A display unit for a kind. Length feetInches, decimalFeet, decimalInches, yards, millimetres, centimetres, metres. Area sqIn, sqFt, sqYd, sqM. Volume cuIn, cuFt, cuYd, cuM, litres. Angle degrees, pitch (inches per 12), percentGrade, dms (display only).
+  - id: "#unit.system"
+    term: Unit system
+    definition: imperial | metric. Picks the default display unit per kind and the base unit for a bare number added to a length (E-K04). Never changes stored values.
+
+  - id: "#precision"
+    term: Precision
+    definition: The display denominator for fractional inches, 2 | 4 | 8 | 16 | 32 | 64 | exact. Default 16. Rounding is display-only (SPEC choice 4). Code Precision.round(_:to:).
+  - id: "#precision.chip"
+    term: Precision chip
+    definition: The tappable chip beside the result showing the precision; shows "≈" when rounding changed the value.
+
+  - id: "#token"
+    term: Token
+    definition: One unit of the expression: number (digits with optional point), feet mark, inch mark, fraction bar, operator (+ − × ÷), percent, open, close, pi, negate.
+  - id: "#expression"
+    term: Expression
+    definition: The ordered tokens typed so far, shown on the expression line exactly as typed (P-02). Evaluated by the engine on = or live when complete.
+  - id: "#engine"
+    term: Entry engine
+    definition: State machine (code EntryEngine) that takes Key values and holds expression, result, error, memory, precision, unit, and the undo snapshot. No SwiftUI.
+  - id: "#engine.key"
+    term: Key
+    definition: digit(0-9), point, feet, inches, fractionBar, plus, minus, times, divide, percent, negate, open, close, pi, equals, backspace, allClear, memoryAdd, memorySubtract, memoryRecall, memoryClear, undo.
+  - id: "#engine.error"
+    term: Engine error
+    definition: divideByZero ("Can't divide by zero"), dimensionMismatch ("Can't add feet and square feet"), incomplete ("Finish the expression"), tooLarge. Shown in the result slot; the expression stays editable.
+
+  - id: "#result"
+    term: Result
+    definition: The evaluated Dimension, exact. Displayed through the unit chip and precision chip. Tap for the formats sheet.
+  - id: "#result.unit-chip"
+    term: Unit chip
+    definition: Shows the current display unit; tap cycles the units of the result's kind (P-08).
+  - id: "#result.formats"
+    term: Formats sheet
+    definition: Every unit of the result's kind at once, each with a Copy and a Use button.
+
+  - id: "#tape"
+    term: Tape
+    definition: The last 200 = results, newest first: expression text, exact result, timestamp. Persisted (P-05, P-06). Tap reuses the result as the next operand; swipe deletes; Clear empties.
+  - id: "#memory"
+    term: Memory
+    definition: One stored Dimension with M+, M−, MR, MC. Persisted. M+ on a different kind is an error.
+  - id: "#undo"
+    term: Undo
+    definition: Restores the expression and result from before the last = or AC. One level.
+
+  - id: "#function"
+    term: Function
+    definition: A trade calculation presented as a sheet: fields in, results list out. Protocol with a registry; see formulas.md §3 for each.
+  - id: "#function.stairs"
+    term: Stairs
+  - id: "#function.roof"
+    term: Roof
+  - id: "#function.concrete"
+    term: Concrete
+  - id: "#function.board-feet"
+    term: Board feet
+  - id: "#function.square-up"
+    term: Square-up
+  - id: "#function.circle"
+    term: Circle & arc
+  - id: "#function.miter"
+    term: Compound miter
+  - id: "#function.polygon"
+    term: Polygon
+  - id: "#function.studs"
+    term: Studs
+  - id: "#function.field"
+    term: Field
+    definition: One labelled input of a function with a kind, a default, and help text with the worked example (P-03).
+  - id: "#function.result"
+    term: Function result
+    definition: One labelled output with a Dimension and an optional warning (code limits, SPEC choice 5). "Use" sends it to the keypad.
+
+  - id: "#look"
+    term: Look
+    definition: glass (default) | tape | daylight | blueprint. Visual option in Settings → Look (SPEC choice 6).
+
+  - id: "#preferences"
+    term: Calc preferences
+    definition: Codable in UserDefaults: unitSystem, precision, look, stair defaults (riser 7-1/2, tread 10, headroom 6'8", floor thickness 10, riserLimited false, riserLimit 7-3/4), concrete waste 10 %, bag 80 lb, spacing 16 o.c.
+
+  - id: "#help"
+    term: Hold-to-see help
+    definition: Long-press on a key or field shows a popover with what it does and one worked example (P-03). Text from copy.md.
