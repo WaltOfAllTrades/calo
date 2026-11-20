@@ -1,0 +1,13 @@
+
+# ---- ios/ (XcodeGen project; source of truth is ios/project.yml) ----
+ios/*.xcodeproj
+ios/.derivedData/
+ios/build/
+ios/App/Info.plist
+ios/.verify/*
+!ios/.verify/last-green.txt
+ios/Packages/*/.build/
+ios/Packages/*/.swiftpm/
+.DS_Store
+*.xcresult
+.claude/settings.local.json

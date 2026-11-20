@@ -1,0 +1,131 @@
+# XcodeGen spec. Generate the project with: xcodegen generate (inside ios/)
+# The .xcodeproj is generated and gitignored; this file is the source of truth.
+# Layout per spec/engineering/architecture.md §2: one app target (both products), three packages,
+# one unit-test target per package plus hosted app tests, one UI test target.
+# Test settings here are read-only to the loop once on main (code-standards 12).
+name: Calo
+options:
+  bundleIdPrefix: com.waltofalltrades
+  deploymentTarget:
+    iOS: "26.0"
+  projectFormat: xcode16_3
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    DEVELOPMENT_TEAM: Z3W92U6PBC          # Walter Wear (Personal Team), free. Do not change without asking.
+    CODE_SIGN_STYLE: Automatic
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_APPROACHABLE_CONCURRENCY: YES
+    SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+packages:
+  DesignSystem:
+    path: Packages/DesignSystem
+  CaloKit:
+    path: Packages/CaloKit
+  CalcKit:
+    path: Packages/CalcKit
+# Hostless package test bundles: fast, cannot reach app code, mirror their package's isolation.
+# Simulator-only bundle IDs: never signed for a device, so they never count against the App ID cap.
+targetTemplates:
+  PackageTests:
+    type: bundle.unit-test
+    platform: iOS
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
+        PRODUCT_BUNDLE_IDENTIFIER: com.waltofalltrades.calo.tests.${target_name}
+        "CODE_SIGNING_ALLOWED[sdk=iphoneos*]": NO
+targets:
+  Calo:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+        excludes: ["Info.plist"]
+    dependencies:
+      - package: DesignSystem
+      - package: CaloKit
+      - package: CalcKit
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Calo
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]   # portrait only (both SPECs)
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.waltofalltrades.calo   # FIXED. Never change without asking (10 App IDs / 7 days).
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_EMIT_LOC_STRINGS: YES
+    # No entitlements file: no capabilities are used.
+  DesignSystemTests:
+    templates: [PackageTests]
+    sources: [Tests/DesignSystemTests]
+    dependencies:
+      - package: DesignSystem
+    settings:
+      base:
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor   # the package is MainActor; its tests match
+  CaloKitTests:
+    templates: [PackageTests]
+    sources: [Tests/CaloKitTests]
+    dependencies:
+      - package: CaloKit
+  CalcKitTests:
+    templates: [PackageTests]
+    sources: [Tests/CalcKitTests]
+    dependencies:
+      - package: CalcKit
+  # App logic tests run inside the app (they need its bundle, strings catalog and types).
+  CaloAppTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Tests/CaloAppTests]
+    dependencies:
+      - target: Calo
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.waltofalltrades.calo.tests   # FIXED (CLAUDE.md)
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Calo.app/Calo"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+  CaloUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: Calo
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.waltofalltrades.calo.uitests   # FIXED (CLAUDE.md)
+        SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
+        TEST_TARGET_NAME: Calo
+schemes:
+  Calo:
+    build:
+      targets:
+        Calo: all
+    test:
+      config: Debug
+      targets:
+        - name: DesignSystemTests
+          parallelizable: false
+        - name: CaloKitTests
+          parallelizable: false
+        - name: CalcKitTests
+          parallelizable: false
+        - name: CaloAppTests
+          parallelizable: false
+        - name: CaloUITests
+          parallelizable: false
+    run:
+      config: Debug
