@@ -9,8 +9,10 @@ _Full breakdown of this run: `docs/REPORT-2026-11-20.md`. Running log: `PROGRESS
 - Branch `ios`: `3f9f62f` (spec, skeleton, first cut), `a50ead8` (review fixes, entry convention,
   accessibility, UI tests), `13083b0` (Construction Master parity, original Calo keys, Classic keys),
   then the docs/feature-flip commit (`pass-feature.sh` fixed to read `dependsOn` across both feature files).
-  **Gate green on `13083b0` at 11:30: 163 tests, 765 assertions**, rerun on the script fix before the flips.
-  All 32 features pass. Merged to `main` by PR (report §9).
+  **Gate green on `13083b0` at 11:30: 163 tests, 765 assertions.** All 32 features pass, the K- ones on Walt's
+  call (the rerun after the script fix hit a simulator flake on an overloaded Mac; report §9). Merged to
+  `main` by PR. The `.verify` stamp does not cover the script fix: **run `ios/scripts/verify.sh` first thing
+  next session** on a rested Mac to restamp.
 - Two products in one install (`com.waltofalltrades.calo`): **Calo** (the web app, native, your keypad
   design) and the **construction calculator** (16 functions, exact fraction engine, tape, memory, five
   looks). Settings → Experiments → Open as switches between them. They share `DesignSystem` only.
@@ -64,6 +66,8 @@ one install (Calo and the construction calculator), every feature in ios/spec/*/
 gate ios/scripts/verify.sh is green. GOAL.md is the assignment of record; ios/spec/ is the spec.
 
 Goal for this session: get both apps on my iPhone and walk them with me, then fix what I find.
+0. First, on a quiet Mac: run ios/scripts/verify.sh once to restamp main (the last run's stamp predates a
+   five-line pass-feature.sh fix). Report the numbers (expect 163 tests, 765 assertions).
 1. Run ios/scripts/refresh-device.sh (phone unlocked, Developer Mode on). First install registers the App ID.
    Report the profile expiry it prints.
 2. Walk me through a test script, one step per message, waiting for my report after each:
