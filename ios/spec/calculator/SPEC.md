@@ -45,10 +45,10 @@ A separate product from Calo. It shares `DesignSystem` and nothing else (code-st
 5. **Code limits are shown, not enforced.** Stairs flag a riser over 7¾″, a tread under 10″ or headroom under
    6′ 8″ (IRC R311.7) with a visible warning; the numbers are still given (the research: apps that ship no
    code tables are preferred by pros, apps that hide the answer are not).
-6. **Four looks, one default.** `Glass` (default: round glass keys, graphite/paper backdrop), `Tape` (rounded
-   square keys, paper tape strip), `Daylight` (maximum contrast, largest keys, no grid), `Blueprint`
-   (blueprint-blue backdrop, white grid). Default `Glass` because it is the only one that reads as the system
-   design and so needs no explanation; the others exist for Walt to try on site. Switchable in Settings → Look.
+6. **Five looks, one default.** `Classic` (default, Walt's call on 2026-11-20: keys that look and press like a
+   real calculator, on a graphite/paper backdrop), `Glass` (round system-glass keys, faint grid), `Tape` (rounded
+   keys on a paper tape strip), `Daylight` (maximum contrast, largest keys, no grid), `Blueprint` (blueprint-blue
+   backdrop, white grid). Switchable in Settings → Look.
 
 ## Do not build
 - Ads, purchases, subscriptions, "pro" tiers, locked keys, trials, accounts, cloud sync, analytics, crash reporting.

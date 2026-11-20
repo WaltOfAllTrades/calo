@@ -54,7 +54,8 @@ Concrete (waste %, bag size), Spacing (o.c.), About, Experiments ›. Identifier
 ## Looks (SPEC choice 6)
 | Look | Backdrop | Keys | Display |
 |---|---|---|---|
-| glass | graphite / paper, faint grid | circles | compact |
+| classic (default, Walt 2026-11-20) | graphite / paper, no grid | rounded keys on a darker base they sink into; graphite digits, grey utility, amber operators, slate unit marks, bright equals | compact |
+| glass | graphite / paper, faint grid | circles (system glass) | compact |
 | tape | paper (both modes, darker in dark), no grid | rounded squares | a paper-strip card behind expression and result |
 | daylight | pure white / pure black, no grid | rounded squares, `Tokens.size.keyMin + 8`, bold labels | high-contrast, larger |
 | blueprint | blueprint blue `#0B3D91` (dark) / `#1E56B8` (light), white grid | circles | white text |

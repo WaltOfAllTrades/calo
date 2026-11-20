@@ -32,9 +32,11 @@ for id in "$@"; do
   state="$(jq -r --arg id "$id" '.features[] | select(.id == $id) | .passes' "$FILE")"
   [ -n "$state" ] || { echo "$id: no such feature in $FILE" >&2; exit 1; }
   [ "$state" = "false" ] || { echo "$id: already passes"; continue; }
-  blocked="$(jq -r --arg id "$id" '
-    (.features | map({key: .id, value: .passes}) | from_entries) as $passes
-    | .features[] | select(.id == $id) | .dependsOn | map(select($passes[.] != true)) | join(" ")' "$FILE")"
+  # dependsOn may cross the two files (the calculator depends on the C- skeleton), so read both.
+  blocked="$(jq -r -s --arg id "$id" '
+    (map(.features[]) | map({key: .id, value: .passes}) | from_entries) as $passes
+    | map(.features[]) | .[] | select(.id == $id) | .dependsOn | map(select($passes[.] != true)) | join(" ")' \
+    spec/calo/features.json spec/calculator/features.json)"
   [ -z "$blocked" ] || { echo "$id: depends on features that do not pass yet: $blocked" >&2; exit 1; }
 
   before="$(jq -S 'del(.features[].passes)' "$FILE")"

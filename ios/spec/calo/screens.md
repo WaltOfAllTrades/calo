@@ -22,8 +22,10 @@ home indicator. Everything must fit a 375×667 pt screen without scrolling (the 
 │  20  00   0  (⏎)                 │
 └──────────────────────────────────┘
 ```
-- Key roles: digits plain; bonus keys secondary (dimmer label); C and ⌫ accent; Enter prominent; the active
-  intent key prominent, the other plain. Switching intent morphs the prominence (`Motion.intentSwitch`).
+- Keys are the web app's (keyButton.css), by Walt's call on 2026-11-20: charcoal number keys, lighter bonus keys,
+  dark-orange intent keys with the active one lit orange inside a white outline, orange action keys, a soft
+  gradient ring, a 90 ms press. Experiments → Calo keys → Glass swaps in system glass keys (digits plain, bonus
+  secondary, C and ⌫ accent, Enter and the active intent prominent).
 - Key symbols: `plus`, `minus`, `delete.left`, `return`. Labels for digits and bonus keys.
 - Dash numbers: grouping separators per locale; remaining negative shows U+2212. Digits are monospaced.
 - Date format: full `EEEE, MMMM d`; medium `EEE, MMMM d`; short `EEE, MMM d` (the web's three variants), chosen by `ViewThatFits`.
