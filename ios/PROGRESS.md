@@ -111,3 +111,17 @@ Two read-only reviews, 15 findings each. Must-fixes applied; the rest logged bel
   label ("Amount typed") and carries the digits as its value. The Experiments rows use text beside a hidden
   symbol: a `Label` inside a `NavigationLink` was drawn but not exposed to accessibility.
 - All 20 UI tests have passed individually after these fixes; the full gate run follows (07:50).
+
+### Construction Master parity push (Walt, ~08:10, "whatever is missing, prioritize, one hour")
+- Three agents, three new files each (no shared files touched), all oracles reproduced to the 1/16:
+  irregular hip/valley with both jack sets and mate mode, rake wall (UG pp. 62–67); drywall, blocks/bricks/
+  pavers, balusters, weight (UG pp. 34–37, 52, 77); arched wall inside/outside and D:M:S entry (UG pp. 41–44, 78).
+  SPEC "Do not build" amended accordingly (own spec); items still out: paint, tile, decking, fences, per-unit cost.
+- New field kinds `number` and `volume` (`5 cu yd`, `27 cu ft`, `2 m3`) so weight and density read naturally.
+- Keypads: Calo's web keys restored as the default (charcoal, orange, bonus grey, gradient ring, lit intent key
+  with white outline, 90 ms press), glass keys kept under Experiments → Calo keys. Calculator default look is
+  now **Classic**: rounded keys with a darker base they sink into, role colours (graphite digits, grey utility,
+  amber operators, slate unit marks, bright equals); Glass, Tape, Daylight, Blueprint remain. `BevelKey` in
+  DesignSystem carries both.
+- Arched-wall stud rule from the oracle: studs every spacing from the centre outward; outside = crown line down
+  to the arc (X5), inside = chord up to the arc (X6). X20 follows the UG's acos reading.

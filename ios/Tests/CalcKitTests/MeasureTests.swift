@@ -141,6 +141,7 @@ struct PrecisionAndFormatTests {
         let fromGrade = AngleFormat.degrees(fromGrade: 47.25)
         #expect(abs(fromGrade - 25.29) < 0.005)
         #expect(AngleFormat.dms(23.71) == "23°42′36″")
+        #expect(AngleFormat.dms(53.1301) == "53°07′48″")
     }
 
     @Test("unit cycles and the precision chip cycle")

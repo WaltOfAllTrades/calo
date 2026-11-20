@@ -27,7 +27,7 @@ A separate product from Calo. It shares `DesignSystem` and nothing else (code-st
 | Toolbar pill | Undo, Tape, Functions, Memory (M+ M− MR MC), Settings. |
 | Tape | Every `=` as a line (expression, result); tap to reuse the result; swipe to delete; clear all; persists; 200 lines. |
 | Memory | One memory with M+, M−, MR, MC; persists. |
-| Functions | Stairs, Roof (pitch, common, hip/valley, jacks, roof area), Concrete (slab, footing, column; waste; bags), Board feet (with count and cost), Square-up / diagonal, Circle & arc, Compound miter, Polygon, Studs. Each: fields, results list, "Use" to send a result to the keypad, hold-to-see help with a worked example. |
+| Functions | Stairs, Roof (pitch, common, hip/valley, jacks, roof area), Irregular hip (irregular hip/valley, both jack sets, mate mode), Rake wall, Arched wall (inside and outside), Concrete (slab, footing, column; waste; bags), Board feet (with count and cost), Square-up / diagonal, Circle & arc, Compound miter, Polygon, Studs, Drywall, Blocks & bricks (blocks, bricks, pavers; waste), Balusters, Weight (tons per cubic yard). Each: fields, results list, "Use" to send a result to the keypad, hold-to-see help with a worked example. Added 2026-11-20 on Walt's instruction to reach Construction Master parity. |
 | Conversions | Length ft-in / decimal ft / decimal in / yd / mm / cm / m; area sq in / sq ft / sq yd / m²; volume cu in / cu ft / cu yd / m³ / L; angle degrees / pitch (in per 12) / percent grade / D:M:S display. |
 | Settings | Unit system (imperial / metric), default precision, stair defaults (riser, tread, headroom, floor thickness, riser limit on/off), concrete waste % and bag size, o.c. spacing, Look (visual option), Experiments (Open as). |
 | Persistence | Engine state, memory, settings and tape restored on launch (P-05, P-06). |
@@ -56,10 +56,10 @@ A separate product from Calo. It shares `DesignSystem` and nothing else (code-st
 - Projects, saved jobs, labelled results, PDF/CSV export, printing, sharing the tape (a later feature; the tape
   model must stay serialisable).
 - Trig keys beyond what the functions need (no sin/cos/tan keys on the keypad); hyperbolic, logs, exponent mode.
-- Material estimators beyond studs: drywall, paint, tile, blocks, bricks, pavers, decking, fences, balusters,
-  rake walls, arched walls, irregular hips. The function registry must make adding one a new type.
-- Weight conversions and concrete weight; cost per unit except board-feet cost.
-- D:M:S entry (display only), "Constant" fraction mode, exponent/overflow modes, Jobber-style sixteenths entry.
+- Material estimators not in the Construction Master: paint, tile, decking, fences. The function registry
+  must make adding one a new type.
+- Cost per unit except board-feet cost.
+- "Constant" fraction mode, exponent/overflow modes, Jobber-style sixteenths entry.
 - A tutorial, onboarding screens, tips beyond hold-to-see help.
 - Haptic or sound customisation; custom fonts.
 

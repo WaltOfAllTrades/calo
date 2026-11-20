@@ -65,5 +65,9 @@ enum L10n {
         static let experimentsOpenAsFooter = LocalizedStringResource("shared.experiments.openAs.footer")
         static let productCalo = LocalizedStringResource("shared.product.calo")
         static let productCalculator = LocalizedStringResource("shared.product.calculator")
+        static let experimentsCaloKeys = LocalizedStringResource("shared.experiments.caloKeys")
+        static let experimentsCaloKeysFooter = LocalizedStringResource("shared.experiments.caloKeys.footer")
+        static let caloKeysOriginal = LocalizedStringResource("shared.caloKeys.original")
+        static let caloKeysGlass = LocalizedStringResource("shared.caloKeys.glass")
     }
 }

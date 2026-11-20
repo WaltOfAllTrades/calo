@@ -121,6 +121,8 @@ public enum AngleFormat {
     public static func dms(_ degrees: Double) -> String {
         let sign = degrees < 0 ? "\u{2212}" : ""
         let total = Int((abs(degrees) * 3600).rounded())
-        return "\(sign)\(total / 3600)°\((total % 3600) / 60)′\(total % 60)″"
+        let minutes = String(format: "%02d", (total % 3600) / 60)
+        let seconds = String(format: "%02d", total % 60)
+        return "\(sign)\(total / 3600)°\(minutes)′\(seconds)″"
     }
 }

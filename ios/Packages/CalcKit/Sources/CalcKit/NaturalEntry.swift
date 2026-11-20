@@ -5,7 +5,7 @@ import Foundation
 /// Same vocabulary as the keypad, so a value copied from the tape pastes back in.
 public enum NaturalEntry {
     public enum Expecting: Sendable {
-        case length, angle, pitch, count, percent, money
+        case length, angle, pitch, count, percent, money, number, volume
     }
 
     public static func parse(_ raw: String, expecting: Expecting = .length) -> FieldValue? {
@@ -25,6 +25,10 @@ public enum NaturalEntry {
         case .percent:
             return Fraction(decimalString: text.replacingOccurrences(of: "%", with: "")
                 .trimmingCharacters(in: .whitespaces)).map { .number($0) }
+        case .number:
+            return Fraction(decimalString: text.replacingOccurrences(of: ",", with: "")).map { .number($0) }
+        case .volume:
+            return volume(text).map { .dimension($0) }
         case .money:
             return Fraction(decimalString: text.replacingOccurrences(of: "$", with: "").replacingOccurrences(
                 of: ",",
@@ -39,8 +43,29 @@ public enum NaturalEntry {
         }
     }
 
+    /// `5 cu yd`, `5 yd3`, `27 cu ft`, `2 m3`, `10 L`; a bare number is cubic yards.
+    static func volume(_ text: String) -> Measure? {
+        let units: [(String, DisplayUnit)] = [
+            ("cu yd", .cuYd), ("cuyd", .cuYd), ("yd3", .cuYd), ("yd³", .cuYd), ("yards", .cuYd), ("yd", .cuYd),
+            ("cu ft", .cuFt), ("cuft", .cuFt), ("ft3", .cuFt), ("ft³", .cuFt), ("cu in", .cuIn), ("in3", .cuIn),
+            ("m3", .cuM), ("m³", .cuM), ("litres", .litres), ("liters", .litres), ("l", .litres),
+        ]
+        for (suffix, unit) in units where text.hasSuffix(suffix) {
+            let number = String(text.dropLast(suffix.count)).trimmingCharacters(in: .whitespaces)
+            guard let value = Fraction(decimalString: number), let factor = unit.factor else { return nil }
+            return .cubicInches(value * factor)
+        }
+        guard let value = Fraction(decimalString: text), let factor = DisplayUnit.cuYd.factor else { return nil }
+        return .cubicInches(value * factor)
+    }
+
     /// `30°`, `30 deg`, `7/12`, `7:12`, `58.8%`, or a bare number (degrees, or in/12 for pitch fields).
     static func angle(_ text: String, bareIsPitch: Bool) -> Measure? {
+        // Degrees, minutes, seconds first (`23°42′39″`, `23.42.39`), then the other spellings.
+        if text.contains("°") || text.contains("′") || text.contains("'") || text.filter({ $0 == "." }).count == 2,
+           let dms = DMS.degrees(fromText: text) {
+            return .degrees(Fraction(approximating: dms, denominator: 10000) ?? .zero)
+        }
         func degrees(_ value: Double) -> Measure {
             .degrees(Fraction(approximating: value, denominator: 10000) ?? .zero)
         }

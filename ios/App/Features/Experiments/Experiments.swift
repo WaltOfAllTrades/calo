@@ -15,20 +15,31 @@ enum Product: String, Codable, CaseIterable, Identifiable, Sendable {
     static let available: [Product] = [.calo, .calculator]
 }
 
+/// Calo's keypad: the web app's bevelled keys (Walt's design, the default) or system glass keys.
+enum CaloKeyStyle: String, Codable, CaseIterable, Identifiable, Sendable {
+    case original, glass
+    var id: String {
+        rawValue
+    }
+}
+
 struct Experiments: Codable, Equatable, Sendable {
     var openAs: Product = .calo
+    var caloKeys: CaloKeyStyle = .original
 
     private enum CodingKeys: String, CodingKey {
-        case openAs
+        case openAs, caloKeys
     }
 
-    init(openAs: Product = .calo) {
+    init(openAs: Product = .calo, caloKeys: CaloKeyStyle = .original) {
         self.openAs = openAs
+        self.caloKeys = caloKeys
     }
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         openAs = (try? container.decodeIfPresent(Product.self, forKey: .openAs)) ?? .calo
+        caloKeys = (try? container.decodeIfPresent(CaloKeyStyle.self, forKey: .caloKeys)) ?? .original
     }
 }
 
@@ -96,9 +107,30 @@ struct ExperimentsScreen: View {
             } footer: {
                 Text(L10n.shared.experimentsOpenAsFooter)
             }
+            Section {
+                Picker(L10n.shared.experimentsCaloKeys, selection: keysBinding) {
+                    Text(L10n.shared.caloKeysOriginal).tag(CaloKeyStyle.original)
+                    Text(L10n.shared.caloKeysGlass).tag(CaloKeyStyle.glass)
+                }
+                .pickerStyle(.inline)
+                .accessibilityIdentifier("shared.experiments.caloKeys")
+            } footer: {
+                Text(L10n.shared.experimentsCaloKeysFooter)
+            }
         }
         .navigationTitle(Text(L10n.shared.experimentsTitle))
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var keysBinding: Binding<CaloKeyStyle> {
+        Binding(
+            get: { store.current.caloKeys },
+            set: { style in
+                var next = store.current
+                next.caloKeys = style
+                store.save(next)
+            }
+        )
     }
 
     private var binding: Binding<Product> {

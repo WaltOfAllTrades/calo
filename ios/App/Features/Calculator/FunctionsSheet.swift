@@ -193,6 +193,8 @@ struct FunctionDetailScreen: View {
         case .count: .count
         case .percent: .percent
         case .money: .money
+        case .number: .number
+        case .volume: .volume
         }
     }
 }
@@ -246,6 +248,18 @@ enum FunctionText {
             "waste",
             "bag",
             "pricePerMbm",
+            "irregularPitch",
+            "jacksMate",
+            "base",
+            "blockWidth",
+            "blockHeight",
+            "gap",
+            "balusterWidth",
+            "volume",
+            "cubicYards",
+            "density",
+            "chord",
+            "inside",
         ]
         return LocalizedStringResource(known.contains(id) ? "calc.help.field.\(id)" : "calc.help.field.generic")
     }

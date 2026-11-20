@@ -51,7 +51,7 @@ struct PreferencesTests {
         let p = CalcPreferences.defaults
         #expect(p.unitSystem == .imperial)
         #expect(p.precision == .sixteenth)
-        #expect(p.look == .glass)
+        #expect(p.look == .classic)
         #expect(p.desiredRiser == Fraction(15, 2))
         #expect(p.desiredTread == Fraction(10))
         #expect(p.headroom == Fraction(80))

@@ -3,7 +3,7 @@ import Foundation
 /// A labelled input of a function (ontology #function.field).
 public struct FunctionField: Hashable, Sendable, Identifiable {
     public enum Kind: String, Hashable, Sendable {
-        case length, angle, count, percent, toggle, bagSize, money
+        case length, angle, count, percent, toggle, bagSize, money, number, volume
     }
 
     public let id: String
@@ -145,8 +145,9 @@ public struct FunctionSpec: Sendable, Identifiable {
     public let solve: @Sendable (FunctionInput, CalcPreferences) -> [FunctionResult]
 
     public static let registry: [FunctionSpec] = [
-        Stairs.spec, Roof.spec, Concrete.spec, BoardFeet.spec, SquareUp.spec,
+        Stairs.spec, Roof.spec, IrregularHip.spec, RakeWall.spec, Concrete.spec, BoardFeet.spec, SquareUp.spec,
         CircleArc.spec, CompoundMiter.spec, Polygon.spec, Studs.spec,
+        Drywall.spec, Blocks.spec, Balusters.spec, Weight.spec, ArchedWall.spec,
     ]
 
     public static func named(_ id: String) -> FunctionSpec? {

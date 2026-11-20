@@ -160,6 +160,7 @@ with a worked example from `formulas.md`.
 | `settings.metric` | Metric |
 | `settings.precision` | Round to |
 | `settings.look` | Look |
+| `look.classic` | Classic |
 | `look.glass` | Glass |
 | `look.tape` | Tape |
 | `look.daylight` | Daylight |

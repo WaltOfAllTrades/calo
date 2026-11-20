@@ -91,7 +91,7 @@ struct CalcKeypadView: View {
     var body: some View {
         GeometryReader { geo in
             let side = KeypadLayout.keySide(in: geo.size, rows: Self.rows, columns: Self.columns)
-            GlassEffectContainer(spacing: Tokens.spacing.glassBlend) {
+            GlassEffectContainer(spacing: style.usesGlassKeys ? Tokens.spacing.glassBlend : 0) {
                 VStack(spacing: Tokens.spacing.keyGap) {
                     ForEach(0 ..< Self.rows, id: \.self) { row in
                         HStack(spacing: Tokens.spacing.keyGap) {
@@ -108,23 +108,53 @@ struct CalcKeypadView: View {
         .accessibilityIdentifier("calc.keypad")
     }
 
+    @Environment(\.colorScheme) private var colorScheme
+
     private func key(_ item: KeyLayout, side: CGFloat) -> some View {
-        GlassKey(
-            label: item.label, symbol: item.symbol, role: item.role, shape: style.keyShape, tint: style.accent,
-            action: { model.press(item.key) }
-        )
-        .frame(width: side, height: side)
-        .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in helpKey = item })
-        .popover(isPresented: Binding(get: { helpKey == item }, set: {
-            if !$0 {
-                helpKey = nil
+        keyControl(item)
+            .frame(width: side, height: side)
+            .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in helpKey = item })
+            .popover(isPresented: Binding(get: { helpKey == item }, set: {
+                if !$0 {
+                    helpKey = nil
+                }
+            })) {
+                HelpPopover(text: item.help)
             }
-        })) {
-            HelpPopover(text: item.help)
+            .accessibilityLabel(a11y(item))
+            .accessibilityHint(Text(item.help))
+            .accessibilityIdentifier("calc.key.\(item.id)")
+    }
+
+    /// Classic looks press like a real calculator (`BevelKey`); the glass look keeps system glass.
+    @ViewBuilder
+    private func keyControl(_ item: KeyLayout) -> some View {
+        if style.usesGlassKeys {
+            GlassKey(
+                label: item.label, symbol: item.symbol, role: item.role, shape: style.keyShape, tint: style.accent,
+                action: { model.press(item.key) }
+            )
+        } else {
+            BevelKey(
+                label: item.label, symbol: item.symbol, palette: style.palette(
+                    Self.role(of: item.key),
+                    colorScheme: colorScheme
+                ),
+                shape: style.bevelShape, font: style.keyFont, action: { model.press(item.key) }
+            )
         }
-        .accessibilityLabel(a11y(item))
-        .accessibilityHint(Text(item.help))
-        .accessibilityIdentifier("calc.key.\(item.id)")
+    }
+
+    /// Digits, utility (AC ⌫ ( ) ± .), operators (÷ × − + %), unit marks (′ ″ ⁄), equals.
+    static func role(of key: Key) -> LookStyle.KeyRole {
+        switch key {
+        case .digit: .digit
+        case .allClear, .backspace, .open, .close, .negate, .point: .utility
+        case .divide, .times, .minus, .plus, .percent: .operation
+        case .feet, .inches, .fractionBar: .unit
+        case .equals: .equals
+        default: .utility
+        }
     }
 
     private func a11y(_ item: KeyLayout) -> String {

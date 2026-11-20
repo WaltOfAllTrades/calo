@@ -2,13 +2,14 @@ import Foundation
 
 /// The calculator's visual option (ontology #look; SPEC choice 6).
 public enum Look: String, Codable, CaseIterable, Sendable, Identifiable {
-    case glass, tape, daylight, blueprint
+    case classic, glass, tape, daylight, blueprint
 
     public var id: String {
         rawValue
     }
 
-    public static let `default` = Look.glass
+    /// Classic: keys that look and press like a real calculator (Walt, 2026-11-20). Glass stays an option.
+    public static let `default` = Look.classic
 }
 
 /// Settings (ontology #preferences): one `Codable` struct with defaults, JSON in UserDefaults.

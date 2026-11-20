@@ -22,11 +22,35 @@ public enum Tokens {
         public static let washOpacity = 0.12
         /// Opacity of the faint grid on `CalcBackdrop`. Tuning value.
         public static let gridOpacity = 0.04
+
+        // Calo's web keypad (keyButton.css): number face, bonus face (number mixed 25 % white),
+        // intent face (accent darkened 62 %), action face = accent, and the bevel ring's two stops.
+        public static let caloKeyNumber = Color(red: 0x2E / 255, green: 0x2C / 255, blue: 0x2B / 255)
+        public static let caloKeyBonus = Color(red: 0x62 / 255, green: 0x61 / 255, blue: 0x60 / 255)
+        public static let caloKeyIntent = Color(red: 0x61 / 255, green: 0x35 / 255, blue: 0x08 / 255)
+        public static let keyRingLight = Color(red: 0xE0 / 255, green: 0xDF / 255, blue: 0xDF / 255)
+        public static let keyRingDark = Color(red: 0x73 / 255, green: 0x73 / 255, blue: 0x73 / 255)
+
+        // The calculator's classic keys: graphite digits, lighter utility keys, amber operators and
+        // equals, slate unit keys; each with the darker base it sinks into.
+        public static let calcKeyDigit = Color(red: 0x30 / 255, green: 0x32 / 255, blue: 0x38 / 255)
+        public static let calcKeyDigitBase = Color(red: 0x1A / 255, green: 0x1B / 255, blue: 0x1F / 255)
+        public static let calcKeyUtility = Color(red: 0x4A / 255, green: 0x4D / 255, blue: 0x55 / 255)
+        public static let calcKeyUtilityBase = Color(red: 0x2A / 255, green: 0x2C / 255, blue: 0x31 / 255)
+        public static let calcKeyOperator = Color(red: 0xF0 / 255, green: 0x9F / 255, blue: 0x1F / 255)
+        public static let calcKeyOperatorBase = Color(red: 0x9A / 255, green: 0x60 / 255, blue: 0x0E / 255)
+        public static let calcKeyUnit = Color(red: 0x2F / 255, green: 0x5D / 255, blue: 0x7A / 255)
+        public static let calcKeyUnitBase = Color(red: 0x1C / 255, green: 0x3A / 255, blue: 0x4D / 255)
+        public static let calcKeyEquals = Color(red: 0xFF / 255, green: 0xB3 / 255, blue: 0x2E / 255)
+        public static let calcKeyEqualsBase = Color(red: 0xB0 / 255, green: 0x74 / 255, blue: 0x0C / 255)
+        public static let calcKeyDarkLabel = Color(red: 0x1A / 255, green: 0x12 / 255, blue: 0x02 / 255)
     }
 
     public enum radius {
         public static let card: CGFloat = 20
         public static let field: CGFloat = 14
+        /// Calculator keys (rounded squares).
+        public static let key: CGFloat = 14
     }
 
     public enum size {

@@ -156,6 +156,7 @@ extension L10n {
         static let settingsMetric = LocalizedStringResource("calc.settings.metric")
         static let settingsPrecision = LocalizedStringResource("calc.settings.precision")
         static let settingsLook = LocalizedStringResource("calc.settings.look")
+        static let lookClassic = LocalizedStringResource("calc.look.classic")
         static let lookGlass = LocalizedStringResource("calc.look.glass")
         static let lookTape = LocalizedStringResource("calc.look.tape")
         static let lookDaylight = LocalizedStringResource("calc.look.daylight")

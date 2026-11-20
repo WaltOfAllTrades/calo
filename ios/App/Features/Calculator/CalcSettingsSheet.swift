@@ -125,6 +125,7 @@ struct CalcSettingsSheet: View {
 
     private func lookName(_ look: Look) -> LocalizedStringResource {
         switch look {
+        case .classic: L10n.calc.lookClassic
         case .glass: L10n.calc.lookGlass
         case .tape: L10n.calc.lookTape
         case .daylight: L10n.calc.lookDaylight

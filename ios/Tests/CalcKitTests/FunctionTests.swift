@@ -323,10 +323,10 @@ struct MiterPolygonStudsTests {
         #expect(count(solve("studs", ["length": ft(18, 7, Fraction(1, 2))])["studs"]) == "15")
     }
 
-    @Test("the registry has nine functions with unique ids and required fields detected")
+    @Test("the registry has every function with unique ids and required fields detected")
     func registry() throws {
-        #expect(FunctionSpec.registry.count == 9)
-        #expect(Set(FunctionSpec.registry.map(\.id)).count == 9)
+        #expect(FunctionSpec.registry.count >= 15)
+        #expect(Set(FunctionSpec.registry.map(\.id)).count == FunctionSpec.registry.count)
         let stairs = try #require(FunctionSpec.named("stairs"))
         #expect(stairs.isComplete(stairs.defaults(.defaults)))
         let board = try #require(FunctionSpec.named("boardFeet"))
